@@ -3,6 +3,14 @@
 
 set -e  # Arrêter en cas d'erreur
 
+echo "📋 Synchronisation des fichiers keymap..."
+cp /home/kebab/colagan-pico-split-keyboard/keymaps/via/keymap.c \
+   /home/kebab/qmk_firmware/keyboards/colagan_v2_right_only/keymaps/via/keymap.c
+cp /home/kebab/colagan-pico-split-keyboard/keymaps/via/config.h \
+   /home/kebab/qmk_firmware/keyboards/colagan_v2_right_only/keymaps/via/config.h
+cp /home/kebab/colagan-pico-split-keyboard/keyboard.json \
+   /home/kebab/qmk_firmware/keyboards/colagan_v2_right_only/keyboard.json
+
 echo "🔨 Compilation du firmware..."
 cd ~/qmk_firmware
 ~/qmk_env/bin/qmk compile -kb colagan_v2_right_only -km via

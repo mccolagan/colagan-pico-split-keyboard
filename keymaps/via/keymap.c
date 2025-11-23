@@ -14,7 +14,9 @@ enum layer_names {
 };
 
 enum custom_keycodes {
-    CTRL_TOG = SAFE_RANGE
+    CTRL_TOG = SAFE_RANGE,
+    RGB_BR_UP,    // Custom pour augmenter luminosité
+    RGB_BR_DN     // Custom pour diminuer luminosité
 };
 
 // Variables pour le multi-tap (double = FN, triple = GAMING)
@@ -99,8 +101,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS, KC_A,    KC_S,    KC_D,    KC_TRNS, KC_TRNS,
         // Ligne 3: Tout transparent (LEDs OFF)
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-        // Ligne 4: Alt gauche(rouge), R(violet), Espace(blanc)
-        KC_LALT, KC_R,    KC_SPC,  KC_TRNS, CTRL_TOG
+        // Ligne 4: Alt gauche(rouge), R(violet), Espace(blanc), Brightness-, Brightness+
+        KC_LALT, KC_R,    KC_SPC,  RGB_BR_DN, RGB_BR_UP
     )
 };
 
@@ -143,6 +145,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 unregister_code(KC_LCTL);
             }
             return false;
+
+        case RGB_BR_UP:
+            if (record->event.pressed) {
+                rgb_matrix_increase_val();
+            }
+            return false;
+
+        case RGB_BR_DN:
+            if (record->event.pressed) {
+                rgb_matrix_decrease_val();
+            }
+            return false;
     }
     return true;
 }
@@ -151,9 +165,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     switch (get_highest_layer(state)) {
         case _GAMING:
-            // Mode gaming : RGB éteint par défaut, sera géré par rgb_matrix_indicators_user
+            // Mode gaming : couleurs custom gérées par rgb_matrix_indicators_user
             rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-            rgb_matrix_sethsv_noeeprom(0, 0, 0);  // Tout noir
             break;
         default:
             // Layers normaux : restaure le mode RGB normal
@@ -165,31 +178,37 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 // Allumer les touches gaming avec couleurs personnalisées
 bool rgb_matrix_indicators_user(void) {
     if (IS_LAYER_ON(_GAMING)) {
+        // Récupérer la luminosité actuelle (0-255)
+        uint8_t val = rgb_matrix_get_val();
+
         // Éteindre toutes les LEDs
         rgb_matrix_set_color_all(0, 0, 0);
 
+        // Appliquer la luminosité à chaque couleur
         // Ligne 0: &(bleu), é(bleu), "(violet), '(violet), ((violet)
-        rgb_matrix_set_color(0, 0, 0, 255);       // LED 0 = - = & (BLEU)
-        rgb_matrix_set_color(1, 0, 0, 255);       // LED 1 = è = é (BLEU)
-        rgb_matrix_set_color(2, 255, 0, 255);     // LED 2 = _ = " (VIOLET/MAGENTA)
-        rgb_matrix_set_color(3, 255, 0, 255);     // LED 3 = ç = ' (VIOLET/MAGENTA)
-        rgb_matrix_set_color(4, 255, 0, 255);     // LED 4 = à = ( (VIOLET/MAGENTA)
+        rgb_matrix_set_color(0, 0, 0, val);                    // LED 0 = - = & (BLEU)
+        rgb_matrix_set_color(1, 0, 0, val);                    // LED 1 = è = é (BLEU)
+        rgb_matrix_set_color(2, val, 0, val);                  // LED 2 = _ = " (VIOLET/MAGENTA)
+        rgb_matrix_set_color(3, val, 0, val);                  // LED 3 = ç = ' (VIOLET/MAGENTA)
+        rgb_matrix_set_color(4, val, 0, val);                  // LED 4 = à = ( (VIOLET/MAGENTA)
 
         // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
-        rgb_matrix_set_color(6, 255, 255, 0);     // LED 6 = Y = Ctrl (JAUNE)
-        rgb_matrix_set_color(7, 255, 255, 0);     // LED 7 = U = Shift (JAUNE)
-        rgb_matrix_set_color(8, 255, 255, 255);   // LED 8 = I = Z (BLANC)
-        rgb_matrix_set_color(9, 255, 255, 0);     // LED 9 = O = E (JAUNE)
+        rgb_matrix_set_color(6, val, val, 0);                  // LED 6 = Y = Ctrl (JAUNE)
+        rgb_matrix_set_color(7, val, val, 0);                  // LED 7 = U = Shift (JAUNE)
+        rgb_matrix_set_color(8, val, val, val);                // LED 8 = I = Z (BLANC)
+        rgb_matrix_set_color(9, val, val, 0);                  // LED 9 = O = E (JAUNE)
 
         // Ligne 2: J=Q(blanc), K=S(blanc), L=D(blanc)
-        rgb_matrix_set_color(13, 255, 255, 255);  // LED 13 = J = Q (BLANC)
-        rgb_matrix_set_color(14, 255, 255, 255);  // LED 14 = K = S (BLANC)
-        rgb_matrix_set_color(15, 255, 255, 255);  // LED 15 = L = D (BLANC)
+        rgb_matrix_set_color(13, val, val, val);               // LED 13 = J = Q (BLANC)
+        rgb_matrix_set_color(14, val, val, val);               // LED 14 = K = S (BLANC)
+        rgb_matrix_set_color(15, val, val, val);               // LED 15 = L = D (BLANC)
 
         // Ligne 4: Del=Alt(rouge), Bksp=R(violet), Enter=Espace(blanc)
-        rgb_matrix_set_color(24, 255, 0, 0);      // LED 24 = Del = Alt gauche (ROUGE)
-        rgb_matrix_set_color(25, 255, 0, 255);    // LED 25 = Bksp = R (VIOLET/MAGENTA)
-        rgb_matrix_set_color(26, 255, 255, 255);  // LED 26 = Enter = Espace (BLANC)
+        rgb_matrix_set_color(24, val, 0, 0);                   // LED 24 = Del = Alt gauche (ROUGE)
+        rgb_matrix_set_color(25, val, 0, val);                 // LED 25 = Bksp = R (VIOLET/MAGENTA)
+        rgb_matrix_set_color(26, val, 0, 0);                   // LED 26 = Enter = Espace (ROUGE)
+        rgb_matrix_set_color(27, val/5, val/5, val/5);         // LED 27 = Brightness- (gris)
+        rgb_matrix_set_color(28, val, val, val);               // LED 28 = Brightness+ (blanc)
     }
     return false;
 }
