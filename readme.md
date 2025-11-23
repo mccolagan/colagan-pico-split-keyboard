@@ -1,239 +1,215 @@
-# Colagan V2 Right Only
+# ⌨️ Colagan V2 Right Only
 
-Clavier split custom - moitié droite uniquement, configurable via VIA.
+> Clavier split custom - moitié droite uniquement, configurable via VIA
 
-## Caractéristiques
+---
 
-- **Processeur:** RP2040
-- **Layout:** 30 touches (6x5)
-- **Matrice:** 5 lignes × 6 colonnes
-- **Configuration:** VIA (reconfiguration en temps réel sans recompilation)
-- **Disposition physique:** Ligne 5 en forme de "montagne" ergonomique
+## ✨ Caractéristiques
 
-## Disposition physique
+- 🧠 **Processeur:** RP2040 (Raspberry Pi Pico)
+- ⌨️ **Layout:** 30 touches (matrice 6×5)
+- 🔌 **Configuration:** VIA (reconfiguration en temps réel)
+- 🖐️ **Ergonomie:** Ligne 5 en forme de "montagne" pour les pouces
+- 🇫🇷 **Optimisé:** AZERTY français
 
-### Ligne 5 - Forme ergonomique
+---
+
+## 🏔️ Disposition physique
+
+### Ligne 5 - Forme ergonomique pour les pouces
+
 ```
        3        ← Sommet (la plus haute)
       / \
-     2   4      ← Ligne du milieu
+     2   4      ← Flancs intermédiaires
     /     \
-   1       5    ← Toutes alignées à la base
+   1       5    ← Base alignée
 ```
 
-Cette disposition en forme de montagne offre un accès ergonomique aux touches du pouce.
+Cette disposition en forme de montagne offre un accès naturel et ergonomique aux touches du pouce.
 
-## Configuration avec VIA
+---
 
-### 1. Accéder à VIA
-
-Ouvrez VIA dans votre navigateur : **https://usevia.app**
-
-Ou installez l'application desktop depuis : https://github.com/the-via/releases/releases
-
-### 2. Charger la définition du clavier
-
-1. Dans VIA, allez dans **Settings** → **Show Design tab**
-2. Cliquez sur l'onglet **Design**
-3. Cliquez sur **Load** et sélectionnez le fichier `colagan_via_v1.json`
-4. Le clavier devrait maintenant être reconnu
-
-### 3. Configurer les touches
-
-- Les modifications sont **instantanées** - pas besoin de recompiler!
-- Changez les touches en cliquant dessus et en sélectionnant la nouvelle fonction
-- Les changements sont sauvegardés dans la mémoire EEPROM du clavier
-
-### 4. Important - Correspondance AZERTY/QWERTY
-
-VIA affiche les touches en **QWERTY US**, mais votre OS utilise **AZERTY français**.
-
-**Correspondances importantes :**
-
-| Pour obtenir (AZERTY) | Sélectionner dans VIA |
-|-----------------------|----------------------|
-| ' (apostrophe) | 4 |
-| é | 2 |
-| è | 7 |
-| à | 0 |
-| ù | ' (QWERTY) |
-| ç | 9 |
-| - | 6 |
-| A | Q |
-| Q | A |
-| W | Z |
-| Z | W |
-| M | ; (point-virgule) |
-| , (virgule) | M |
-
-**Astuce :** Basculez temporairement votre OS en QWERTY pendant la configuration pour avoir un aperçu direct.
-
-```bash
-# Linux - Basculer temporairement en QWERTY
-setxkbmap us
-
-# Revenir en AZERTY français
-setxkbmap fr
-```
-
-### 5. Gestion des layers
-
-Pour passer à une autre layer dans VIA, utilisez ces keycodes :
-
-- **MO(1)** - Layer 1 momentanée (maintien)
-- **TG(1)** - Toggle layer 1 (bascule)
-- **TO(1)** - Passer définitivement à layer 1
-- **LT(1, KC)** - Layer 1 en maintien, touche KC en tap
-
-## Structure des fichiers
+## 📁 Structure des fichiers
 
 ```
-keyboards/colagan_v2_right_only/
-├── colagan_via_v1.json              # Définition VIA (à charger dans VIA)
-├── via_backup.json                  # Backup de votre configuration VIA
-├── keyboard.json                     # Configuration matérielle QMK
-├── rules.mk                          # Options de compilation
-├── readme.md                         # Ce fichier
-└── keymaps/
+colagan-pico-split-keyboard/
+├── 🔨 build.sh                       # Script de compilation rapide
+├── ⚡ flash.sh                       # Script de flash automatique
+├── 📦 firmware.uf2                   # Firmware compilé (versionné)
+├── 🎛️ colagan_via_v1.json            # Définition VIA (à charger dans VIA)
+├── 💾 via_backup.json                # Backup de votre configuration VIA
+├── ⚙️ keyboard.json                  # Configuration matérielle QMK
+├── 📖 readme.md                      # Ce fichier
+└── 🗂️ keymaps/
     └── via/                          # Keymap avec support VIA
         ├── keymap.c
         ├── config.h
         └── rules.mk
 ```
 
-## Compilation et flash
+---
 
-### 1. Compiler le firmware avec support VIA
+## 🚀 Quick Start
 
-**Méthode rapide avec le script :**
+### 1️⃣ Compiler le firmware
+
+**Méthode rapide (recommandée) :**
 ```bash
 ./build.sh
 ```
 
 **Méthode manuelle :**
 ```bash
-# Avec QMK CLI
 ~/qmk_env/bin/qmk compile -kb colagan_v2_right_only -km via
-
-# Copier dans le projet
 cp ~/qmk_firmware/colagan_v2_right_only_via.uf2 ./firmware.uf2
 ```
 
-Le firmware compilé est versionné dans le repo : `firmware.uf2`
+### 2️⃣ Flasher le Pico
 
-### 2. Flasher sur le RP2040
+**Entrer en mode bootloader :**
 
-**Méthode 1 - Mode bootloader :**
-1. Maintenir le bouton **BOOT**
-2. Appuyer brièvement sur **RESET**
-3. Relâcher **BOOT**
+- 🔹 **Méthode 1:** Maintenir `BOOT` + appuyer `RESET` + relâcher `BOOT`
+- 🔹 **Méthode 2:** Double-tap rapide sur `RESET`
 
-**Méthode 2 - Double-tap RESET :**
-- Double-tap rapide sur le bouton RESET
-
-**Copier le firmware :**
-
-*Méthode rapide avec le script :*
+**Flasher automatiquement :**
 ```bash
 ./flash.sh
 ```
 
-*Méthode manuelle :*
+**Ou manuellement :**
 ```bash
-# Détection automatique du point de montage du Pico
+# Détection automatique du Pico
 sudo cp firmware.uf2 /media/$USER/RPI-RP2*/
-
-# Ou avec recherche dynamique
-PICO_MOUNT=$(ls -d /media/$USER/RPI-RP2* 2>/dev/null | head -n1)
-sudo cp firmware.uf2 "$PICO_MOUNT/"
 ```
 
-Le clavier redémarre automatiquement avec le nouveau firmware.
+✅ Le clavier redémarre automatiquement !
 
-### 3. Vérifier que VIA fonctionne
+### 3️⃣ Configurer avec VIA
 
-1. Ouvrez VIA (https://usevia.app)
-2. Chargez la définition `colagan_via_v1.json`
-3. Votre clavier devrait être détecté automatiquement
-4. Vous pouvez maintenant configurer vos touches!
+1. 🌐 Ouvrez [VIA](https://usevia.app) dans votre navigateur
+2. ⚙️ Allez dans **Settings** → Activez **Show Design tab**
+3. 📂 Onglet **Design** → **Load** → Sélectionnez `colagan_via_v1.json`
+4. ✨ Votre clavier est détecté ! Configurez vos touches en temps réel
 
-## Configuration matérielle
+---
 
-### Pins GPIO (définis dans keyboard.json)
+## 🎹 Configuration VIA
 
-- **Colonnes (cols):** GP20, GP22, GP12, GP11, GP10, GP9
-- **Lignes (rows):** GP21, GP19, GP18, GP17, GP16
+### 🔄 Correspondances AZERTY ↔ QWERTY
 
-### USB VID/PID
+> ⚠️ VIA affiche en **QWERTY US**, mais votre OS utilise **AZERTY français**
 
-- **Vendor ID:** 0xFEED
-- **Product ID:** 0x0004
+| 🇫🇷 Pour obtenir (AZERTY) | 🇺🇸 Sélectionner dans VIA |
+|---------------------------|---------------------------|
+| `'` (apostrophe)          | `4`                       |
+| `é`                       | `2`                       |
+| `è`                       | `7`                       |
+| `à`                       | `0`                       |
+| `ù`                       | `'` (quote QWERTY)        |
+| `ç`                       | `9`                       |
+| `-` (tiret)               | `6`                       |
+| `A`                       | `Q`                       |
+| `Q`                       | `A`                       |
+| `W`                       | `Z`                       |
+| `Z`                       | `W`                       |
+| `M`                       | `;` (point-virgule)       |
+| `,` (virgule)             | `M`                       |
+
+**💡 Astuce :** Basculez temporairement en QWERTY pour voir en direct :
+
+```bash
+setxkbmap us    # Passer en QWERTY
+setxkbmap fr    # Revenir en AZERTY
+```
+
+### 🎚️ Gestion des layers
+
+| Keycode      | Action                                |
+|--------------|---------------------------------------|
+| `MO(1)`      | 👆 Layer 1 momentanée (maintien)     |
+| `TG(1)`      | 🔄 Toggle layer 1 (bascule)           |
+| `TO(1)`      | ➡️ Passer définitivement à layer 1    |
+| `LT(1, KC)`  | 🔀 Layer 1 en maintien, touche KC en tap |
+
+---
+
+## 🔧 Configuration matérielle
+
+### 📌 Pins GPIO
+
+**Colonnes (6):** `GP20`, `GP22`, `GP12`, `GP11`, `GP10`, `GP9`
+**Lignes (5):** `GP21`, `GP19`, `GP18`, `GP17`, `GP16`
+
+### 🔌 USB VID/PID
+
+- **Vendor ID:** `0xFEED`
+- **Product ID:** `0x0004`
 - **Nom:** Colagan V2 Right Only
 
-## Dépannage
+---
 
-### VIA ne détecte pas le clavier
+## 🛠️ Dépannage
 
-1. Vérifiez que vous avez compilé avec `-km via`
-2. Vérifiez que le firmware est bien flashé
-3. Rechargez la page VIA
-4. Essayez de charger manuellement `colagan_via_v1.json` dans l'onglet Design
+### ❌ VIA ne détecte pas le clavier
 
-### Les touches ne correspondent pas aux symboles
+1. ✅ Vérifiez la compilation avec `-km via`
+2. 🔄 Rechargez la page VIA
+3. 📂 Chargez manuellement `colagan_via_v1.json` dans l'onglet Design
+4. 🔌 Vérifiez la connexion USB :
+   ```bash
+   lsusb | grep -i feed
+   # Devrait afficher : ID feed:0004 Colagan V2 Right Only
+   ```
 
-- C'est normal! VIA affiche en QWERTY, votre OS est en AZERTY
-- Référez-vous au tableau de correspondances ci-dessus
-- Ou basculez temporairement en QWERTY pour configurer
+### 🔤 Les touches ne correspondent pas
 
-### Les modifications VIA ne persistent pas
+➡️ **Normal !** VIA affiche en QWERTY, votre OS est en AZERTY
+📋 Référez-vous au tableau de correspondances ci-dessus
 
-- Les modifications sont normalement sauvegardées dans l'EEPROM
-- Si elles ne persistent pas, essayez de recompiler avec `VIA_ENABLE = yes` dans `rules.mk`
+### 💾 Les modifications VIA ne persistent pas
 
-### Le clavier n'est pas reconnu
+- Les changements sont sauvegardés dans l'EEPROM du clavier
+- Vérifiez que `VIA_ENABLE = yes` dans `keymaps/via/rules.mk`
 
-```bash
-# Vérifier que le clavier est connecté
-lsusb | grep -i feed
+### 🔄 Reset de la configuration VIA
 
-# Devrait afficher quelque chose comme :
-# Bus XXX Device XXX: ID feed:0004 Colagan V2 Right Only
-```
+**Option 1 :** Dans VIA → Settings → "Clear Saved Layout"
+**Option 2 :** Reflasher le firmware
 
-### Reset de la configuration VIA
+---
 
-Pour remettre le clavier à zéro :
-1. Dans VIA, allez dans Settings
-2. Cliquez sur "Clear Saved Layout"
-3. Ou reflashez le firmware
-
-## Commandes utiles
+## 📚 Commandes utiles
 
 ```bash
-# Compiler avec support VIA
+# 🔨 Compiler
 ~/qmk_env/bin/qmk compile -kb colagan_v2_right_only -km via
 
-# Flasher directement
+# ⚡ Flasher directement
 ~/qmk_env/bin/qmk flash -kb colagan_v2_right_only -km via
 
-# Nettoyer les fichiers de compilation
+# 🧹 Nettoyer les fichiers de compilation
 ~/qmk_env/bin/qmk clean
 
-# Vérifier la configuration QMK
+# 🩺 Vérifier la configuration QMK
 ~/qmk_env/bin/qmk doctor
 
-# Voir les informations du clavier
+# ℹ️ Informations du clavier
 ~/qmk_env/bin/qmk info -kb colagan_v2_right_only
 ```
 
-## Ressources
+---
 
-- [VIA](https://www.caniusevia.com/) - Site officiel VIA
-- [VIA Web App](https://usevia.app) - Application web VIA
-- [Documentation QMK](https://docs.qmk.fm/)
-- [QMK VIA Support](https://docs.qmk.fm/features/via)
-- [Configuration RP2040](https://docs.qmk.fm/platformdev_rp2040)
+## 🔗 Ressources
 
-## License
+- 🌐 [VIA Web App](https://usevia.app)
+- 📖 [Documentation VIA](https://www.caniusevia.com/)
+- 📚 [Documentation QMK](https://docs.qmk.fm/)
+- 🔧 [QMK VIA Support](https://docs.qmk.fm/features/via)
+- 🔌 [Configuration RP2040](https://docs.qmk.fm/platformdev_rp2040)
+
+---
+
+## 📄 License
 
 GPL-2.0-or-later
