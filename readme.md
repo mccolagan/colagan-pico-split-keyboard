@@ -132,9 +132,20 @@ Le firmware compilé est versionné dans le repo : `firmware.uf2`
 - Double-tap rapide sur le bouton RESET
 
 **Copier le firmware :**
+
+*Méthode rapide avec le script :*
 ```bash
-# Le RP2040 apparaît comme lecteur USB "RPI-RP2"
-sudo cp firmware.uf2 /media/$USER/RPI-RP21/
+./flash.sh
+```
+
+*Méthode manuelle :*
+```bash
+# Détection automatique du point de montage du Pico
+sudo cp firmware.uf2 /media/$USER/RPI-RP2*/
+
+# Ou avec recherche dynamique
+PICO_MOUNT=$(ls -d /media/$USER/RPI-RP2* 2>/dev/null | head -n1)
+sudo cp firmware.uf2 "$PICO_MOUNT/"
 ```
 
 Le clavier redémarre automatiquement avec le nouveau firmware.
