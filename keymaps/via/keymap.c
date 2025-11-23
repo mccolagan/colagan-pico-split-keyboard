@@ -9,16 +9,17 @@
 
 enum layer_names {
     _BASE,
-    _FN
+    _FN,
+    _GAMING
 };
 
 enum custom_keycodes {
     CTRL_TOG = SAFE_RANGE
 };
 
-// Variables pour le double-tap
+// Variables pour le multi-tap (double = FN, triple = GAMING)
 static uint16_t ctrl_timer = 0;
-static bool ctrl_tapped = false;
+static uint8_t ctrl_tap_count = 0;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base Layer - Côté DROIT
@@ -73,6 +74,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LSFT, KC_NUBS, KC_Z,    KC_X,    KC_C,    KC_V,
         // Ligne 5: Del, Backspace, Enter, Alt, Ctrl toggle
         KC_DEL,  KC_BSPC, KC_ENT,  KC_LALT, CTRL_TOG
+    ),
+
+    /* Gaming Layer - ZQSD au centre (I-J-K-L) avec RGB blanc
+     * ,---------------------------------------------------.
+     * | --- | --- | --- | --- | --- | --- |  (LEDs OFF)
+     * |-----+-----+-----+-----+-----+-----|
+     * | --- | --- |  Z  | --- | --- | --- |  (I=Z blanc)
+     * |-----+-----+-----+-----+-----+-----|
+     * | --- |  Q  |  S  |  D  | --- | --- |  (J=Q K=S L=D blanc)
+     * |-----+-----+-----+-----+-----+-----|
+     * | --- | --- | --- | --- | --- | --- |  (LEDs OFF)
+     * |-----+-----+-----+-----+-----+-----|
+     * | --- | --- | --- | --- |Ctrl | --- |  (Triple-tap pour toggle)
+     * |     |     |     |     |3xGM |     |
+     * `---------------------------------------------------'
+     */
+    [_GAMING] = LAYOUT(
+        // Ligne 0: Tout transparent (LEDs OFF)
+        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+        // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
+        KC_LCTL, KC_LSFT, KC_W,    KC_E,    KC_TRNS, KC_TRNS,
+        // Ligne 2: J=Q(blanc), K=S(blanc), L=D(blanc)
+        KC_TRNS, KC_A,    KC_S,    KC_D,    KC_TRNS, KC_TRNS,
+        // Ligne 3: Tout transparent (LEDs OFF)
+        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+        // Ligne 4: Ctrl toggle pour sortir
+        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, CTRL_TOG
     )
 };
 
@@ -80,20 +108,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case CTRL_TOG:
             if (record->event.pressed) {
-                // Premier tap ou double-tap ?
-                if (ctrl_tapped && timer_elapsed(ctrl_timer) < TAPPING_TERM) {
-                    // Double-tap détecté ! Toggle layer FN
+                // Vérifier si on est dans la fenêtre de multi-tap
+                if (timer_elapsed(ctrl_timer) < TAPPING_TERM) {
+                    ctrl_tap_count++;
+                } else {
+                    ctrl_tap_count = 1;
+                }
+
+                ctrl_timer = timer_read();
+
+                if (ctrl_tap_count == 2) {
+                    // Double-tap = Toggle layer FN
                     if (IS_LAYER_ON(_FN)) {
                         layer_off(_FN);
                     } else {
                         layer_on(_FN);
+                        layer_off(_GAMING);  // Désactive GAMING si actif
                     }
-                    ctrl_tapped = false;
+                } else if (ctrl_tap_count == 3) {
+                    // Triple-tap = Toggle layer GAMING
+                    if (IS_LAYER_ON(_GAMING)) {
+                        layer_off(_GAMING);
+                    } else {
+                        layer_on(_GAMING);
+                        layer_off(_FN);  // Désactive FN si actif
+                    }
+                    ctrl_tap_count = 0;  // Reset le compteur
                 } else {
                     // Premier tap - Envoie Ctrl
                     register_code(KC_LCTL);
-                    ctrl_timer = timer_read();
-                    ctrl_tapped = true;
                 }
             } else {
                 // Relâchement de la touche
@@ -102,4 +145,39 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
     }
     return true;
+}
+
+// Configuration RGB par layer
+layer_state_t layer_state_set_user(layer_state_t state) {
+    switch (get_highest_layer(state)) {
+        case _GAMING:
+            // Mode gaming : RGB éteint par défaut, sera géré par rgb_matrix_indicators_user
+            rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+            rgb_matrix_sethsv_noeeprom(0, 0, 0);  // Tout noir
+            break;
+        default:
+            // Layers normaux : restaure le mode RGB normal
+            break;
+    }
+    return state;
+}
+
+// Allumer les touches gaming avec couleurs personnalisées
+bool rgb_matrix_indicators_user(void) {
+    if (IS_LAYER_ON(_GAMING)) {
+        // Éteindre toutes les LEDs
+        rgb_matrix_set_color_all(0, 0, 0);
+
+        // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
+        rgb_matrix_set_color(6, 255, 255, 0);     // LED 6 = Y = Ctrl (JAUNE)
+        rgb_matrix_set_color(7, 255, 255, 0);     // LED 7 = U = Shift (JAUNE)
+        rgb_matrix_set_color(8, 255, 255, 255);   // LED 8 = I = Z (BLANC)
+        rgb_matrix_set_color(9, 255, 255, 0);     // LED 9 = O = E (JAUNE)
+
+        // Ligne 2: J=Q, K=S, L=D (blanc)
+        rgb_matrix_set_color(13, 255, 255, 255);  // LED 13 = J = Q (BLANC)
+        rgb_matrix_set_color(14, 255, 255, 255);  // LED 14 = K = S (BLANC)
+        rgb_matrix_set_color(15, 255, 255, 255);  // LED 15 = L = D (BLANC)
+    }
+    return false;
 }

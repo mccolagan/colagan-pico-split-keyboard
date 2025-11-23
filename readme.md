@@ -38,15 +38,13 @@ colagan-pico-split-keyboard/
 ├── 🔨 build.sh                       # Script de compilation rapide
 ├── ⚡ flash.sh                       # Script de flash automatique
 ├── 📦 firmware.uf2                   # Firmware compilé (versionné)
-├── 🎛️ colagan_via_v1.json            # Définition VIA (à charger dans VIA)
-├── 💾 via_backup.json                # Backup de votre configuration VIA
-├── ⚙️ keyboard.json                  # Configuration matérielle QMK
+├── ⚙️ keyboard.json                  # Configuration matérielle QMK + RGB
 ├── 📖 readme.md                      # Ce fichier
 └── 🗂️ keymaps/
     └── via/                          # Keymap avec support VIA
-        ├── keymap.c
-        ├── config.h
-        └── rules.mk
+        ├── keymap.c                  # Layout des touches
+        ├── config.h                  # Configuration additionnelle
+        └── rules.mk                  # Options de compilation
 ```
 
 ---
@@ -89,9 +87,12 @@ sudo cp firmware.uf2 /media/$USER/RPI-RP2*/
 ### 3️⃣ Configurer avec VIA
 
 1. 🌐 Ouvrez [VIA](https://usevia.app) dans votre navigateur
-2. ⚙️ Allez dans **Settings** → Activez **Show Design tab**
-3. 📂 Onglet **Design** → **Load** → Sélectionnez `colagan_via_v1.json`
-4. ✨ Votre clavier est détecté ! Configurez vos touches en temps réel
+2. 🔌 Le clavier est détecté automatiquement
+3. ✨ Configurez vos touches en temps réel
+
+**💡 Reset EEPROM (appliquer le layout du firmware) :**
+- VIA → Settings ⚙️ → Clear EEPROM / Reset EEPROM
+- Déconnectez/reconnectez le clavier
 
 ---
 
@@ -155,21 +156,23 @@ setxkbmap fr    # Revenir en AZERTY
 
 ### 🌈 Contrôles RGB
 
-Les LEDs RGB peuvent être contrôlées avec les keycodes suivants dans VIA :
+Les LEDs RGB peuvent être contrôlées avec les keycodes suivants dans VIA (onglet **Lighting** → **QMK RGB Matrix**) :
 
 | Keycode       | Action                                    |
 |---------------|-------------------------------------------|
-| `RGB_TOG`     | 💡 On/Off des LEDs                        |
-| `RGB_MOD`     | ➡️ Animation suivante                     |
-| `RGB_RMOD`    | ⬅️ Animation précédente                   |
-| `RGB_HUI`     | 🔴 Augmenter la teinte (hue)              |
-| `RGB_HUD`     | 🔵 Diminuer la teinte (hue)               |
-| `RGB_SAI`     | ⬆️ Augmenter la saturation                |
-| `RGB_SAD`     | ⬇️ Diminuer la saturation                 |
-| `RGB_VAI`     | ☀️ Augmenter la luminosité                |
-| `RGB_VAD`     | 🌙 Diminuer la luminosité                 |
-| `RGB_SPI`     | ⚡ Augmenter la vitesse d'animation       |
-| `RGB_SPD`     | 🐌 Diminuer la vitesse d'animation        |
+| `RM_TOGG`     | 💡 On/Off des LEDs                        |
+| `RM_NEXT`     | ➡️ Animation suivante                     |
+| `RM_PREV`     | ⬅️ Animation précédente                   |
+| `RM_HUEU`     | 🔴 Augmenter la teinte (hue)              |
+| `RM_HUED`     | 🔵 Diminuer la teinte (hue)               |
+| `RM_SATU`     | ⬆️ Augmenter la saturation                |
+| `RM_SATD`     | ⬇️ Diminuer la saturation                 |
+| `RM_VALU`     | ☀️ Augmenter la luminosité                |
+| `RM_VALD`     | 🌙 Diminuer la luminosité                 |
+| `RM_SPDU`     | ⚡ Augmenter la vitesse d'animation       |
+| `RM_SPDD`     | 🐌 Diminuer la vitesse d'animation        |
+
+**💡 Astuce :** Assignez ces keycodes à des touches via VIA pour contrôler les LEDs sans passer par l'interface web.
 
 ### ✨ Animations disponibles
 
@@ -185,7 +188,7 @@ Le firmware inclut plus de 40 animations RGB Matrix :
 
 - **LEDs:** 30 SK6812 MINI-E (1 par touche)
 - **Câblage:** Serpentin (zigzag ligne par ligne)
-- **Luminosité max:** 200 (sur 255)
+- **Luminosité max:** 50 (sur 255)
 - **Pin data:** GP13
 
 ---
@@ -215,15 +218,16 @@ Le firmware inclut plus de 40 animations RGB Matrix :
 
 ### 🔄 Reset de la configuration VIA
 
-**Option 1 :** Dans VIA → Settings → "Clear Saved Layout"
-**Option 2 :** Reflasher le firmware
+**Option 1 :** Dans VIA → Settings ⚙️ → "Clear EEPROM" ou "Reset EEPROM", puis déconnectez/reconnectez
+**Option 2 :** Bootmagic Reset - Maintenez la touche en haut à gauche (L0C0) pendant le branchement USB
 
 ### 💡 Les LEDs RGB ne fonctionnent pas
 
 1. ✅ Vérifiez que `rgb_matrix: true` est activé dans `keyboard.json`
 2. 🔌 Vérifiez le câblage sur GP13
-3. 🔄 Testez avec `RGB_TOG` pour allumer/éteindre les LEDs
+3. 🔄 Assignez `RM_TOGG` à une touche via VIA pour tester (onglet Lighting → QMK RGB Matrix)
 4. 🎨 Vérifiez le câblage serpentin (ligne 0 gauche→droite, ligne 1 droite→gauche, etc.)
+5. 💡 Vérifiez que la luminosité n'est pas à 0 (utilisez `RM_VALU` pour augmenter)
 
 ---
 
