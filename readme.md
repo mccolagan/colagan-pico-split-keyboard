@@ -90,30 +90,36 @@ Pour passer à une autre layer dans VIA, utilisez ces keycodes :
 ```
 keyboards/colagan_v2_right_only/
 ├── colagan_via_v1.json              # Définition VIA (à charger dans VIA)
-├── colagan_v2_right_only.layout.json # Backup de votre configuration VIA
+├── via_backup.json                  # Backup de votre configuration VIA
 ├── keyboard.json                     # Configuration matérielle QMK
 ├── rules.mk                          # Options de compilation
 ├── readme.md                         # Ce fichier
 └── keymaps/
-    ├── default/                      # Keymap par défaut
-    │   └── keymap.c
     └── via/                          # Keymap avec support VIA
-        └── keymap.c
+        ├── keymap.c
+        ├── config.h
+        └── rules.mk
 ```
 
 ## Compilation et flash
 
 ### 1. Compiler le firmware avec support VIA
 
+**Méthode rapide avec le script :**
+```bash
+./build.sh
+```
+
+**Méthode manuelle :**
 ```bash
 # Avec QMK CLI
 ~/qmk_env/bin/qmk compile -kb colagan_v2_right_only -km via
 
-# Ou pour flasher directement
-~/qmk_env/bin/qmk flash -kb colagan_v2_right_only -km via
+# Copier dans le projet
+cp ~/qmk_firmware/colagan_v2_right_only_via.uf2 ./firmware.uf2
 ```
 
-Le firmware sera créé dans : `colagan_v2_right_only_via.uf2`
+Le firmware compilé est versionné dans le repo : `firmware.uf2`
 
 ### 2. Flasher sur le RP2040
 
@@ -128,7 +134,7 @@ Le firmware sera créé dans : `colagan_v2_right_only_via.uf2`
 **Copier le firmware :**
 ```bash
 # Le RP2040 apparaît comme lecteur USB "RPI-RP2"
-cp colagan_v2_right_only_via.uf2 /media/<user>/RPI-RP2/
+sudo cp firmware.uf2 /media/$USER/RPI-RP21/
 ```
 
 Le clavier redémarre automatiquement avec le nouveau firmware.
@@ -144,8 +150,8 @@ Le clavier redémarre automatiquement avec le nouveau firmware.
 
 ### Pins GPIO (définis dans keyboard.json)
 
-- **Lignes (rows):** GP0, GP1, GP2, GP3, GP4
-- **Colonnes (cols):** GP5, GP6, GP7, GP8, GP9, GP10
+- **Colonnes (cols):** GP20, GP22, GP12, GP11, GP10, GP9
+- **Lignes (rows):** GP21, GP19, GP18, GP17, GP16
 
 ### USB VID/PID
 

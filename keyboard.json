@@ -12,8 +12,8 @@
         "nkro": true
     },
     "matrix_pins": {
-        "cols": ["GP11", "GP9", "GP19", "GP20", "GP21", "GP22"],
-        "rows": ["GP10", "GP12", "GP13", "GP14", "GP15"]
+        "cols": ["GP20", "GP22", "GP12", "GP11", "GP10", "GP9"],
+        "rows": ["GP21", "GP19", "GP18", "GP17", "GP16"]
     },
     "usb": {
         "device_version": "2.0.0",
