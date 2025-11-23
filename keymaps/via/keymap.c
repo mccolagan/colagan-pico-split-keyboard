@@ -1,110 +1,107 @@
 // Copyright 2025 kebab (@kebab)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// Keymap pour côté DROIT uniquement - Layout AZERTY FR
-// Layer BASE : Partie droite AZERTY
-// Layer FN : Partie gauche AZERTY (double-tap Ctrl pour toggle)
-
 #include QMK_KEYBOARD_H
 
+// ============================================================================
+// LAYER DEFINITIONS
+// ============================================================================
+
 enum layer_names {
-    _BASE,
-    _FN,
-    _GAMING
+    _BASE,      // Côté droit du clavier AZERTY
+    _FN,        // Côté gauche du clavier AZERTY (double-tap Ctrl)
+    _GAMING     // Layout gaming avec ZQSD et RGB personnalisé (triple-tap Ctrl)
 };
+
+// ============================================================================
+// CUSTOM KEYCODES
+// ============================================================================
 
 enum custom_keycodes {
-    CTRL_TOG = SAFE_RANGE,
-    RGB_BR_UP,    // Custom pour augmenter luminosité
-    RGB_BR_DN     // Custom pour diminuer luminosité
+    CTRL_TOG = SAFE_RANGE,  // Multi-tap: 1x=Ctrl, 2x=toggle FN, 3x=toggle GAMING
+    RGB_BR_UP,              // Augmenter la luminosité RGB
+    RGB_BR_DN               // Diminuer la luminosité RGB
 };
 
-// Variables pour le multi-tap (double = FN, triple = GAMING)
+// Variables pour le multi-tap
 static uint16_t ctrl_timer = 0;
 static uint8_t ctrl_tap_count = 0;
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /* Base Layer - Côté DROIT
-     * ,---------------------------------------------------.
-     * |  -  |  è  |  _  |  ç  |  à  |  )  |
-     * |-----+-----+-----+-----+-----+-----|
-     * |  Y  |  U  |  I  |  O  |  P  |  ^  |
-     * |-----+-----+-----+-----+-----+-----|
-     * |  H  |  J  |  K  |  L  |  M  |  ù  |
-     * |-----+-----+-----+-----+-----+-----|
-     * |  B  |  N  |  ,  |  ;  |  :  |  !  |
-     * |-----+-----+-----+-----+-----+-----|
-     * | Del |Bksp | Ent | Alt |Ctrl |  X  |
-     * |     |     |     |     |2xFN |     |
-     * `---------------------------------------------------'
-     */
+// ============================================================================
+// KEYMAPS
+// ============================================================================
 
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    /* Layer BASE - Côté DROIT AZERTY
+     * ┌─────┬─────┬─────┬─────┬─────┬─────┐
+     * │  -  │  è  │  _  │  ç  │  à  │  )  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │  Y  │  U  │  I  │  O  │  P  │  ^  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │  H  │  J  │  K  │  L  │  M  │  ù  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │  B  │  N  │  ,  │  ;  │  :  │  !  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │ Del │Bksp │ Ent │ Alt │Ctrl │     │
+     * │     │     │     │     │ 2xFN│     │
+     * └─────┴─────┴─────┴─────┴─────┴─────┘
+     */
     [_BASE] = LAYOUT(
-        // Ligne 1: -, è, _, ç, à, ) (pour OS AZERTY)
         KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS,
-        // Ligne 2: y, u, i, o, p, ^
         KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC,
-        // Ligne 3: h, j, k, l, m, ù (AZERTY FR)
         KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
-        // Ligne 4: b, n, ,, ;, :, ! (AZERTY FR)
         KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,
-        // Ligne 5: Del, Backspace, Enter, Alt, Ctrl (double-tap toggle)
         KC_DEL,  KC_BSPC, KC_ENT,  KC_LALT, CTRL_TOG
     ),
 
-    /* Function Layer - Côté GAUCHE AZERTY (pour OS AZERTY)
-     * ,---------------------------------------------------.
-     * |  ²  |  &  |  é  |  "  |  '  |  (  |
-     * |-----+-----+-----+-----+-----+-----|
-     * | Tab |  A  |  Z  |  E  |  R  |  T  |
-     * |-----+-----+-----+-----+-----+-----|
-     * |Caps |  Q  |  S  |  D  |  F  |  G  |
-     * |-----+-----+-----+-----+-----+-----|
-     * |Shift|  <  |  W  |  X  |  C  |  V  |
-     * |-----+-----+-----+-----+-----+-----|
-     * | Del |Bksp | Ent | Alt | /// |  X  |
-     * `---------------------------------------------------'
+    /* Layer FN - Côté GAUCHE AZERTY
+     * ┌─────┬─────┬─────┬─────┬─────┬─────┐
+     * │  ²  │  &  │  é  │  "  │  '  │  (  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │ Tab │  A  │  Z  │  E  │  R  │  T  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │Caps │  Q  │  S  │  D  │  F  │  G  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │Shift│  <  │  W  │  X  │  C  │  V  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │ Del │Bksp │ Ent │ Alt │Ctrl │     │
+     * └─────┴─────┴─────┴─────┴─────┴─────┘
      */
     [_FN] = LAYOUT(
-        // Ligne 1: ², &, é, ", ', ( (pour OS AZERTY)
         KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,
-        // Ligne 2: Tab, A, Z, E, R, T (pour OS AZERTY)
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,
-        // Ligne 3: Caps Lock, Q, S, D, F, G (pour OS AZERTY)
         KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,
-        // Ligne 4: Shift, <, W, X, C, V (pour OS AZERTY)
         KC_LSFT, KC_NUBS, KC_Z,    KC_X,    KC_C,    KC_V,
-        // Ligne 5: Del, Backspace, Enter, Alt, Ctrl toggle
         KC_DEL,  KC_BSPC, KC_ENT,  KC_LALT, CTRL_TOG
     ),
 
-    /* Gaming Layer - ZQSD au centre (I-J-K-L) avec RGB blanc
-     * ,---------------------------------------------------.
-     * | --- | --- | --- | --- | --- | --- |  (LEDs OFF)
-     * |-----+-----+-----+-----+-----+-----|
-     * | --- | --- |  Z  | --- | --- | --- |  (I=Z blanc)
-     * |-----+-----+-----+-----+-----+-----|
-     * | --- |  Q  |  S  |  D  | --- | --- |  (J=Q K=S L=D blanc)
-     * |-----+-----+-----+-----+-----+-----|
-     * | --- | --- | --- | --- | --- | --- |  (LEDs OFF)
-     * |-----+-----+-----+-----+-----+-----|
-     * | --- | --- | --- | --- |Ctrl | --- |  (Triple-tap pour toggle)
-     * |     |     |     |     |3xGM |     |
-     * `---------------------------------------------------'
+    /* Layer GAMING - Layout optimisé pour le jeu
+     * Triple-tap sur Ctrl pour activer/désactiver
+     *
+     * ┌─────┬─────┬─────┬─────┬─────┬─────┐
+     * │  &  │  é  │  "  │  '  │  (  │     │ (bleu/violet)
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │Ctrl │Shift│  Z  │  E  │     │     │ (jaune/blanc)
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │     │  Q  │  S  │  D  │     │     │ (blanc - ZQSD)
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │     │     │     │     │     │     │ (éteint)
+     * ├─────┼─────┼─────┼─────┼─────┼─────┘
+     * │ Alt │  R  │Space│ Br- │ Br+ │ (rouge/violet/blanc)
+     * └─────┴─────┴─────┴─────┴─────┘
      */
     [_GAMING] = LAYOUT(
-        // Ligne 0: &(bleu), é(bleu), "(violet), '(violet), ((violet), reste OFF
         KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_TRNS,
-        // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
         KC_LCTL, KC_LSFT, KC_W,    KC_E,    KC_TRNS, KC_TRNS,
-        // Ligne 2: J=Q(blanc), K=S(blanc), L=D(blanc)
         KC_TRNS, KC_A,    KC_S,    KC_D,    KC_TRNS, KC_TRNS,
-        // Ligne 3: Tout transparent (LEDs OFF)
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-        // Ligne 4: Alt gauche(rouge), R(violet), Espace(blanc), Brightness-, Brightness+
         KC_LALT, KC_R,    KC_SPC,  RGB_BR_DN, RGB_BR_UP
     )
 };
+
+// ============================================================================
+// KEYCODE PROCESSING
+// ============================================================================
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
@@ -116,32 +113,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 } else {
                     ctrl_tap_count = 1;
                 }
-
                 ctrl_timer = timer_read();
 
                 if (ctrl_tap_count == 2) {
-                    // Double-tap = Toggle layer FN
+                    // Double-tap: Toggle layer FN
                     if (IS_LAYER_ON(_FN)) {
                         layer_off(_FN);
                     } else {
                         layer_on(_FN);
-                        layer_off(_GAMING);  // Désactive GAMING si actif
+                        layer_off(_GAMING);
                     }
                 } else if (ctrl_tap_count == 3) {
-                    // Triple-tap = Toggle layer GAMING
+                    // Triple-tap: Toggle layer GAMING
                     if (IS_LAYER_ON(_GAMING)) {
                         layer_off(_GAMING);
                     } else {
                         layer_on(_GAMING);
-                        layer_off(_FN);  // Désactive FN si actif
+                        layer_off(_FN);
                     }
-                    ctrl_tap_count = 0;  // Reset le compteur
+                    ctrl_tap_count = 0;
                 } else {
-                    // Premier tap - Envoie Ctrl
+                    // Premier tap: Envoyer Ctrl
                     register_code(KC_LCTL);
                 }
             } else {
-                // Relâchement de la touche
                 unregister_code(KC_LCTL);
             }
             return false;
@@ -161,54 +156,54 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+// ============================================================================
+// RGB CONFIGURATION
+// ============================================================================
+
 // Configuration RGB par layer
 layer_state_t layer_state_set_user(layer_state_t state) {
     switch (get_highest_layer(state)) {
         case _GAMING:
-            // Mode gaming : couleurs custom gérées par rgb_matrix_indicators_user
             rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
             break;
         default:
-            // Layers normaux : restaure le mode RGB normal
             break;
     }
     return state;
 }
 
-// Allumer les touches gaming avec couleurs personnalisées
+// Couleurs RGB personnalisées pour le layer GAMING
 bool rgb_matrix_indicators_user(void) {
     if (IS_LAYER_ON(_GAMING)) {
-        // Récupérer la luminosité actuelle (0-255)
         uint8_t val = rgb_matrix_get_val();
 
         // Éteindre toutes les LEDs
         rgb_matrix_set_color_all(0, 0, 0);
 
-        // Appliquer la luminosité à chaque couleur
-        // Ligne 0: &(bleu), é(bleu), "(violet), '(violet), ((violet)
-        rgb_matrix_set_color(0, 0, 0, val);                    // LED 0 = - = & (BLEU)
-        rgb_matrix_set_color(1, 0, 0, val);                    // LED 1 = è = é (BLEU)
-        rgb_matrix_set_color(2, val, 0, val);                  // LED 2 = _ = " (VIOLET/MAGENTA)
-        rgb_matrix_set_color(3, val, 0, val);                  // LED 3 = ç = ' (VIOLET/MAGENTA)
-        rgb_matrix_set_color(4, val, 0, val);                  // LED 4 = à = ( (VIOLET/MAGENTA)
+        // Ligne 0: Chiffres (&, é, ", ', ()
+        rgb_matrix_set_color(0, 0, 0, val);        // & - BLEU
+        rgb_matrix_set_color(1, 0, 0, val);        // é - BLEU
+        rgb_matrix_set_color(2, val, 0, val);      // " - VIOLET
+        rgb_matrix_set_color(3, val, 0, val);      // ' - VIOLET
+        rgb_matrix_set_color(4, val, 0, val);      // ( - VIOLET
 
-        // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
-        rgb_matrix_set_color(6, val, val, 0);                  // LED 6 = Y = Ctrl (JAUNE)
-        rgb_matrix_set_color(7, val, val, 0);                  // LED 7 = U = Shift (JAUNE)
-        rgb_matrix_set_color(8, val, val, val);                // LED 8 = I = Z (BLANC)
-        rgb_matrix_set_color(9, val, val, 0);                  // LED 9 = O = E (JAUNE)
+        // Ligne 1: Modificateurs et mouvement vertical (Ctrl, Shift, Z, E)
+        rgb_matrix_set_color(6, val, val, 0);      // Ctrl - JAUNE
+        rgb_matrix_set_color(7, val, val, 0);      // Shift - JAUNE
+        rgb_matrix_set_color(8, val, val, val);    // Z - BLANC
+        rgb_matrix_set_color(9, val, val, 0);      // E - JAUNE
 
-        // Ligne 2: J=Q(blanc), K=S(blanc), L=D(blanc)
-        rgb_matrix_set_color(13, val, val, val);               // LED 13 = J = Q (BLANC)
-        rgb_matrix_set_color(14, val, val, val);               // LED 14 = K = S (BLANC)
-        rgb_matrix_set_color(15, val, val, val);               // LED 15 = L = D (BLANC)
+        // Ligne 2: ZQSD (Q, S, D)
+        rgb_matrix_set_color(13, val, val, val);   // Q - BLANC
+        rgb_matrix_set_color(14, val, val, val);   // S - BLANC
+        rgb_matrix_set_color(15, val, val, val);   // D - BLANC
 
-        // Ligne 4: Del=Alt(rouge), Bksp=R(violet), Enter=Espace(blanc)
-        rgb_matrix_set_color(24, val, 0, 0);                   // LED 24 = Del = Alt gauche (ROUGE)
-        rgb_matrix_set_color(25, val, 0, val);                 // LED 25 = Bksp = R (VIOLET/MAGENTA)
-        rgb_matrix_set_color(26, val, 0, 0);                   // LED 26 = Enter = Espace (ROUGE)
-        rgb_matrix_set_color(27, val/5, val/5, val/5);         // LED 27 = Brightness- (gris)
-        rgb_matrix_set_color(28, val, val, val);               // LED 28 = Brightness+ (blanc)
+        // Ligne 4: Actions (Alt, R, Espace, Brightness)
+        rgb_matrix_set_color(24, val, 0, 0);       // Alt - ROUGE
+        rgb_matrix_set_color(25, val, 0, val);     // R - VIOLET
+        rgb_matrix_set_color(26, val, val, val);   // Espace - BLANC
+        rgb_matrix_set_color(27, val/5, val/5, val/5);  // Br- - GRIS
+        rgb_matrix_set_color(28, val, val, val);   // Br+ - BLANC
     }
     return false;
 }
