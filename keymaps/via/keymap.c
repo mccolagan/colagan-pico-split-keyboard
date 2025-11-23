@@ -91,16 +91,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * `---------------------------------------------------'
      */
     [_GAMING] = LAYOUT(
-        // Ligne 0: Tout transparent (LEDs OFF)
-        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+        // Ligne 0: &(bleu), é(bleu), "(violet), '(violet), ((violet), reste OFF
+        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_TRNS,
         // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
         KC_LCTL, KC_LSFT, KC_W,    KC_E,    KC_TRNS, KC_TRNS,
         // Ligne 2: J=Q(blanc), K=S(blanc), L=D(blanc)
         KC_TRNS, KC_A,    KC_S,    KC_D,    KC_TRNS, KC_TRNS,
         // Ligne 3: Tout transparent (LEDs OFF)
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-        // Ligne 4: Ctrl toggle pour sortir
-        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, CTRL_TOG
+        // Ligne 4: Alt gauche(rouge), R(violet), Espace(blanc)
+        KC_LALT, KC_R,    KC_SPC,  KC_TRNS, CTRL_TOG
     )
 };
 
@@ -168,16 +168,28 @@ bool rgb_matrix_indicators_user(void) {
         // Éteindre toutes les LEDs
         rgb_matrix_set_color_all(0, 0, 0);
 
+        // Ligne 0: &(bleu), é(bleu), "(violet), '(violet), ((violet)
+        rgb_matrix_set_color(0, 0, 0, 255);       // LED 0 = - = & (BLEU)
+        rgb_matrix_set_color(1, 0, 0, 255);       // LED 1 = è = é (BLEU)
+        rgb_matrix_set_color(2, 255, 0, 255);     // LED 2 = _ = " (VIOLET/MAGENTA)
+        rgb_matrix_set_color(3, 255, 0, 255);     // LED 3 = ç = ' (VIOLET/MAGENTA)
+        rgb_matrix_set_color(4, 255, 0, 255);     // LED 4 = à = ( (VIOLET/MAGENTA)
+
         // Ligne 1: Y=Ctrl(jaune), U=Shift(jaune), I=Z(blanc), O=E(jaune)
         rgb_matrix_set_color(6, 255, 255, 0);     // LED 6 = Y = Ctrl (JAUNE)
         rgb_matrix_set_color(7, 255, 255, 0);     // LED 7 = U = Shift (JAUNE)
         rgb_matrix_set_color(8, 255, 255, 255);   // LED 8 = I = Z (BLANC)
         rgb_matrix_set_color(9, 255, 255, 0);     // LED 9 = O = E (JAUNE)
 
-        // Ligne 2: J=Q, K=S, L=D (blanc)
+        // Ligne 2: J=Q(blanc), K=S(blanc), L=D(blanc)
         rgb_matrix_set_color(13, 255, 255, 255);  // LED 13 = J = Q (BLANC)
         rgb_matrix_set_color(14, 255, 255, 255);  // LED 14 = K = S (BLANC)
         rgb_matrix_set_color(15, 255, 255, 255);  // LED 15 = L = D (BLANC)
+
+        // Ligne 4: Del=Alt(rouge), Bksp=R(violet), Enter=Espace(blanc)
+        rgb_matrix_set_color(24, 255, 0, 0);      // LED 24 = Del = Alt gauche (ROUGE)
+        rgb_matrix_set_color(25, 255, 0, 255);    // LED 25 = Bksp = R (VIOLET/MAGENTA)
+        rgb_matrix_set_color(26, 255, 255, 255);  // LED 26 = Enter = Espace (BLANC)
     }
     return false;
 }

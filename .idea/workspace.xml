@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fd28ac95-b2e4-4afa-8f5d-fecacca89de7" name="Changes" comment="v0.2 clean">
-      <change beforePath="$PROJECT_DIR$/firmware.uf2" beforeDir="false" afterPath="$PROJECT_DIR$/firmware.uf2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keymaps/via/config.h" beforeDir="false" afterPath="$PROJECT_DIR$/keymaps/via/config.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keymaps/via/keymap.c" beforeDir="false" afterPath="$PROJECT_DIR$/keymaps/via/keymap.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
-    </list>
+    <list default="true" id="fd28ac95-b2e4-4afa-8f5d-fecacca89de7" name="Changes" comment="v0.3 gaming layout" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,24 +26,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/kebab/colagan-zmk",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/kebab/colagan-zmk&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "stardust.markdown.MarkdownSplitEditorSuppressor:keyList": []
+  &quot;keyToStringList&quot;: {
+    &quot;stardust.markdown.MarkdownSplitEditorSuppressor:keyList&quot;: []
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -65,7 +60,7 @@
       <option name="presentableId" value="Default" />
       <updated>1763854031033</updated>
       <workItem from="1763854033540" duration="228000" />
-      <workItem from="1763893172564" duration="25737000" />
+      <workItem from="1763893172564" duration="26521000" />
     </task>
     <task id="LOCAL-00001" summary="v0.2">
       <option name="closed" value="true" />
@@ -115,7 +110,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763926926315</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="v0.3 gaming layout">
+      <option name="closed" value="true" />
+      <created>1763931089019</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1763931089019</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,6 +140,7 @@
     <MESSAGE value="v0.2 test rgb" />
     <MESSAGE value="v0.2 rgb ok" />
     <MESSAGE value="v0.2 clean" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.2 clean" />
+    <MESSAGE value="v0.3 gaming layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.3 gaming layout" />
   </component>
 </project>
