@@ -9,6 +9,7 @@
 - 🧠 **Processeur:** RP2040 (Raspberry Pi Pico)
 - ⌨️ **Layout:** 30 touches (matrice 6×5)
 - 🔌 **Configuration:** VIA (reconfiguration en temps réel)
+- 💡 **RGB:** 30 LEDs SK6812 MINI-E (1 par touche)
 - 🖐️ **Ergonomie:** Ligne 5 en forme de "montagne" pour les pouces
 - 🇫🇷 **Optimisé:** AZERTY français
 
@@ -140,12 +141,52 @@ setxkbmap fr    # Revenir en AZERTY
 
 **Colonnes (6):** `GP20`, `GP22`, `GP12`, `GP11`, `GP10`, `GP9`
 **Lignes (5):** `GP21`, `GP19`, `GP18`, `GP17`, `GP16`
+**RGB LEDs:** `GP13` (WS2812/SK6812 data)
 
 ### 🔌 USB VID/PID
 
 - **Vendor ID:** `0xFEED`
 - **Product ID:** `0x0004`
 - **Nom:** Colagan V2 Right Only
+
+---
+
+## 💡 RGB Matrix
+
+### 🌈 Contrôles RGB
+
+Les LEDs RGB peuvent être contrôlées avec les keycodes suivants dans VIA :
+
+| Keycode       | Action                                    |
+|---------------|-------------------------------------------|
+| `RGB_TOG`     | 💡 On/Off des LEDs                        |
+| `RGB_MOD`     | ➡️ Animation suivante                     |
+| `RGB_RMOD`    | ⬅️ Animation précédente                   |
+| `RGB_HUI`     | 🔴 Augmenter la teinte (hue)              |
+| `RGB_HUD`     | 🔵 Diminuer la teinte (hue)               |
+| `RGB_SAI`     | ⬆️ Augmenter la saturation                |
+| `RGB_SAD`     | ⬇️ Diminuer la saturation                 |
+| `RGB_VAI`     | ☀️ Augmenter la luminosité                |
+| `RGB_VAD`     | 🌙 Diminuer la luminosité                 |
+| `RGB_SPI`     | ⚡ Augmenter la vitesse d'animation       |
+| `RGB_SPD`     | 🐌 Diminuer la vitesse d'animation        |
+
+### ✨ Animations disponibles
+
+Le firmware inclut plus de 40 animations RGB Matrix :
+
+- 🌊 **Ambiance:** Breathing, Gradient, Rainbow Moving Chevron
+- 🎨 **Cycle:** Cycle All, Cycle Pinwheel, Cycle Spiral
+- 🌧️ **Effets:** Raindrops, Digital Rain, Pixel Rain
+- 🔥 **Réactives:** Typing Heatmap, Solid Reactive, Splash
+- ⭐ **Avancées:** Dual Beacon, Rainbow Beacon, Jellybean Raindrops
+
+### ⚙️ Configuration RGB
+
+- **LEDs:** 30 SK6812 MINI-E (1 par touche)
+- **Câblage:** Serpentin (zigzag ligne par ligne)
+- **Luminosité max:** 200 (sur 255)
+- **Pin data:** GP13
 
 ---
 
@@ -176,6 +217,13 @@ setxkbmap fr    # Revenir en AZERTY
 
 **Option 1 :** Dans VIA → Settings → "Clear Saved Layout"
 **Option 2 :** Reflasher le firmware
+
+### 💡 Les LEDs RGB ne fonctionnent pas
+
+1. ✅ Vérifiez que `rgb_matrix: true` est activé dans `keyboard.json`
+2. 🔌 Vérifiez le câblage sur GP13
+3. 🔄 Testez avec `RGB_TOG` pour allumer/éteindre les LEDs
+4. 🎨 Vérifiez le câblage serpentin (ligne 0 gauche→droite, ligne 1 droite→gauche, etc.)
 
 ---
 

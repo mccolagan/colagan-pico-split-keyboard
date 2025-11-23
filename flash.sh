@@ -26,7 +26,13 @@ if [ ! -f "firmware.uf2" ]; then
 fi
 
 echo "📤 Copie du firmware..."
-sudo cp firmware.uf2 "$PICO_MOUNT/"
+# Utilise cat > pour éviter les problèmes de permissions avec cp
+cat firmware.uf2 > "$PICO_MOUNT/firmware.uf2"
+sync
+echo "✓ Copie réussie"
 
 echo "✅ Firmware flashé avec succès !"
 echo "🔄 Le clavier va redémarrer automatiquement..."
+echo "⏳ Attendre 5 secondes..."
+sleep 5
+echo "✅ Flash terminé !"
