@@ -59,8 +59,8 @@ th{background:var(--code-bg);font-weight:600}
 .tabs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .board-wrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 12px;overflow-x:auto}
-#board{position:relative;margin:0 auto;--u:58px;width:calc(var(--u) * 6.4);height:calc(var(--u) * 5.9)}
-.key{position:absolute;width:calc(var(--u) - 6px);height:calc(var(--u) - 6px);display:flex;flex-direction:column;
+#board{position:relative;margin:0 auto;--u:58px;width:calc(var(--u) * 9.1);height:calc(var(--u) * 6.2)}
+.key{position:absolute;display:flex;flex-direction:column;
   align-items:center;justify-content:center;background:var(--key);color:var(--key-text);
   border:1px solid var(--key-edge);border-bottom-width:3px;border-radius:8px;font-weight:600;font-size:.95rem;
   text-align:center;line-height:1.1}
@@ -83,7 +83,8 @@ ul.clean li{margin:.35em 0}
 .timeline li::before{content:"";position:absolute;left:-6px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
 .timeline b{font-weight:650}
 footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);margin-top:40px}
-@media (max-width:520px){#board{--u:50px}}
+@media (max-width:520px){#board{--u:46px}}
+.shot{width:100%;height:auto;border:1px solid var(--line);border-radius:12px;display:block;margin:12px 0}
 </style>
 </head>
 <body>
@@ -101,6 +102,7 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
     <a href="#resume">Résumé</a>
     <a href="#couches">Couches</a>
     <a href="#multitap">Touche Ctrl</a>
+    <a href="#pcb">PCB</a>
     <a href="#materiel">Matériel</a>
     <a href="#build">Build &amp; flash</a>
     <a href="#depot">Dépôt</a>
@@ -117,11 +119,11 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
     <div class="card"><div class="k">Contrôleur</div><div class="v">RP2040</div><div class="s">Raspberry Pi Pico, bootloader rp2040</div></div>
     <div class="card"><div class="k">Touches</div><div class="v">29</div><div class="s">matrice 6×5, 4 rangées de 6 + 5 pouces</div></div>
     <div class="card"><div class="k">Firmware</div><div class="v">QMK + VIA</div><div class="s">variante Vial également présente</div></div>
-    <div class="card"><div class="k">RGB</div><div class="v">29 LEDs</div><div class="s">WS2812 sur GP13, câblage serpentin</div></div>
+    <div class="card"><div class="k">RGB</div><div class="v">29 LEDs</div><div class="s">WS2812 sur GP13, chaîne linéaire</div></div>
     <div class="card"><div class="k">Couches</div><div class="v">3</div><div class="s">BASE · FN · GAMING</div></div>
     <div class="card"><div class="k">Version</div><div class="v">v0.3</div><div class="s">« gaming layout », novembre 2025</div></div>
   </div>
-  <p style="margin-top:16px">Le clavier est <em>« right only »</em> : une seule moitié, la droite, sert de clavier complet. La couche BASE porte le côté droit de l'AZERTY ; un double-tap sur Ctrl bascule sur la couche FN, qui porte le côté gauche. Un triple-tap active le mode GAMING (ZQSD, éclairage dédié).</p>
+  <p style="margin-top:16px">Le clavier est <em>« right only »</em> : une seule moitié, la droite, sert de clavier complet (le PCB est conçu réversible, voir plus bas). La couche BASE porte le côté droit de l'AZERTY ; un double-tap sur Ctrl bascule sur la couche FN, qui porte le côté gauche. Un triple-tap active le mode GAMING (ZQSD, éclairage dédié).</p>
 </section>
 
 <section id="couches">
@@ -131,7 +133,6 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
     <button type="button" data-layer="base" aria-pressed="true">BASE</button>
     <button type="button" data-layer="fn" aria-pressed="false">FN</button>
     <button type="button" data-layer="gaming" aria-pressed="false">GAMING</button>
-    <button type="button" id="ledToggle" aria-pressed="false" hidden>Voir les LEDs réellement allumées</button>
   </div>
   <div class="board-wrap"><div id="board" role="img" aria-label="Disposition des touches de la couche sélectionnée"></div></div>
   <p id="layerNote" class="muted" style="margin-top:12px"></p>
@@ -149,6 +150,20 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
   </table>
 </section>
 
+<section id="pcb">
+  <h2>Le PCB</h2>
+  <p>Dessiné sous KiCad : « Colagan Pico Split KeyBoard V.1 », dernière version du 20 octobre 2025. Il est conçu <em>réversible</em> (empreintes « Reverse ») : le même circuit sert pour les deux moitiés, en le retournant.</p>
+  <img class="shot" src="img/pcb-3d.png" alt="Rendu 3D du PCB : grille 6×4 et cinq touches de pouce en arc" loading="lazy">
+  <ul class="clean">
+    <li><strong>Grille :</strong> 6 colonnes × 4 rangées au pas de 19,05 mm ; la colonne extérieure (CH6, CH12, CH18, CH24) fait 1,5U.</li>
+    <li><strong>Pouces :</strong> cinq touches en arc sous la grille, du côté intérieur. CH27 est droite sous la première colonne ; CH26 et CH28 sont inclinées de 22,5° ; CH25 et CH29, plus bas, de 45°. Les extrêmes s'écartent vers l'extérieur de l'arc.</li>
+    <li><strong>Interrupteurs :</strong> empreintes KS33 (Gateron low profile), une LED CMS et une diode par touche.</li>
+    <li><strong>Électronique :</strong> support Raspberry Pi Pico en haut à gauche, USB-C avec ses résistances de 5,1 kΩ, résistances de 4,7 kΩ, et un composant de conversion de niveau 3,3 V → 5 V pour la ligne de données des LEDs.</li>
+    <li><strong>Variantes :</strong> une version avec écran OLED (<code>SPlitKeyBoardReversibleOLED</code>) existe à côté.</li>
+  </ul>
+  <p class="muted">Sources : <code>SPlitKeyBoardReversible.kicad_pcb</code> (positions et rotations lues dans le fichier) et captures d'écran KiCad.</p>
+</section>
+
 <section id="materiel">
   <h2>Matériel</h2>
   <div class="grid">
@@ -159,12 +174,13 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
     <div class="card"><div class="k">USB</div><div class="v" style="font-size:1rem">VID 0xFEED · PID 0x0004</div></div>
     <div class="card"><div class="k">Fonctions</div><div class="v" style="font-size:1rem">bootmagic · extrakey · mousekey · NKRO · RGB matrix</div></div>
   </div>
-  <h3>Ordre des LEDs (serpentin)</h3>
-  <pre>rangée 0 :  0  1  2  3  4  5      (gauche → droite)
-rangée 1 : 11 10  9  8  7  6      (droite → gauche)
+  <h3>Ordre des LEDs (chaîne linéaire)</h3>
+  <pre>rangée 0 :  0  1  2  3  4  5      (CH1  → CH6)
+rangée 1 :  6  7  8  9 10 11      (CH7  → CH12)
 rangée 2 : 12 13 14 15 16 17
-rangée 3 : 23 22 21 20 19 18
-pouces   : 24 25 26 27 28</pre>
+rangée 3 : 18 19 20 21 22 23
+pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
+  <p class="muted">Vérifié dans le PCB : la sortie de la LED de chaque touche est reliée à l'entrée de la suivante, dans l'ordre CH1 à CH29, toujours de gauche à droite.</p>
   <p class="muted">Luminosité maximale 200/255. Plus de 40 animations RGB matrix activées pour les couches BASE et FN.</p>
 </section>
 
@@ -192,7 +208,7 @@ pouces   : 24 25 26 27 28</pre>
 ├── build.sh · flash.sh    # compilation et flash
 ├── firmware.uf2           # dernier firmware compilé (v0.3)
 ├── readme.md              # guide d'utilisation détaillé
-└── docs/index.html        # cette page</pre>
+└── docs/index.html        # cette page (+ docs/img : captures du PCB)</pre>
   <p class="muted">Pour compiler, le projet dépend d'un clone de <code>qmk_firmware</code> dans lequel <code>build.sh</code> copie les fichiers : la définition du clavier n'est pas encore autonome.</p>
 </section>
 
@@ -202,7 +218,7 @@ pouces   : 24 25 26 27 28</pre>
 
   <h3>Comportement</h3>
   <ul class="clean">
-    <li><span class="tag bug">À vérifier</span><strong>LEDs de la couche GAMING.</strong> <code>keymap.c</code> allume les LEDs 6 à 9 pour Ctrl, Shift, Z et E, mais la rangée 1 est câblée en sens inverse (LED 11 = Ctrl, 10 = Shift, 9 = Z, 8 = E). Ce serait les mauvaises touches qui s'éclairent ; la bascule « LEDs réellement allumées » ci-dessus montre le résultat attendu d'après <code>keyboard.json</code>.</li>
+    <li><span class="tag bug">Bug</span><strong>Coordonnées des LEDs dans <code>keyboard.json</code>.</strong> Les rangées 1 et 3 y sont parcourues de droite à gauche (câblage serpentin) alors que la chaîne réelle est linéaire, et les positions des pouces sont approximatives. Les animations spatiales (dégradés, vagues, spirales) sont donc décalées. L'éclairage du mode GAMING, lui, utilise les bons indices.</li>
     <li><span class="tag bug">À vérifier</span><strong>Ctrl rapides.</strong> Deux appuis sur Ctrl en moins de 200 ms (par exemple Ctrl+C puis Ctrl+V enchaînés) peuvent être pris pour un double-tap et basculer la couche FN.</li>
     <li><span class="tag todo">Idée</span>Remplacer le compteur maison par un <em>Tap Dance</em> QMK, ou donner à FN une touche de couche dédiée (momentanée) pour éviter de basculer au clavier.</li>
     <li><span class="tag todo">Idée</span>Indiquer visuellement la couche active (LED dédiée ou couleur) pour BASE et FN, comme c'est déjà fait pour GAMING.</li>
@@ -210,14 +226,15 @@ pouces   : 24 25 26 27 28</pre>
 
   <h3>Matériel et structure</h3>
   <ul class="clean">
-    <li><span class="tag todo">Idée</span>Compléter la moitié gauche pour un vrai clavier split (l'ancien dossier <code>colagan_v2</code> n'existe plus que dans l'historique de <code>qmk_firmware</code>).</li>
+    <li><span class="tag todo">Idée</span>Corriger la section <code>layout</code> de <code>keyboard.json</code> (pouces, colonne 1,5U) à partir du PCB pour que VIA affiche la vraie forme.</li>
+    <li><span class="tag todo">Idée</span>Le PCB étant réversible, compléter la moitié gauche pour un vrai clavier split (l'ancien dossier <code>colagan_v2</code> n'existe plus que dans l'historique de <code>qmk_firmware</code>).</li>
     <li><span class="tag todo">Idée</span>Rendre le dépôt autonome avec un <em>QMK userspace</em> (<code>qmk_userspace</code>) et un workflow GitHub Actions qui compile le <code>.uf2</code> à chaque commit.</li>
     <li><span class="tag todo">Idée</span>Rapprocher les variantes VIA et Vial ; la version de <code>keyboard.json</code> de <code>qmk_firmware</code> utilise la nouvelle syntaxe VIA (<code>menus</code> / <code>keycodes</code>) et diffère de celle de ce dépôt.</li>
   </ul>
 
   <h3>Documentation et hygiène</h3>
   <ul class="clean">
-    <li><span class="tag doc">Doc</span>Le readme annonce 30 touches et 30 LEDs ; <code>keyboard.json</code> en définit 29 (24 + 5 pouces).</li>
+    <li><span class="tag doc">Doc</span>Le readme annonce un câblage serpentin et 30 touches/LEDs ; le PCB est linéaire et  <code>keyboard.json</code> en définit 29 (24 + 5 pouces).</li>
     <li><span class="tag doc">Doc</span>Luminosité par défaut : le readme et le commentaire de <code>config.h</code> disent 10 % (26/255), la valeur codée est <code>128</code> (environ 50 %).</li>
     <li><span class="tag doc">Doc</span>Les messages de commit sont répétés (« v0.3 gaming layout » ×4) ; adopter Conventional Commits et des tags de version (<code>v0.3</code>).</li>
     <li><span class="tag doc">Doc</span>Les dossiers <code>.idea/</code> et <code>.claude/</code> ne devraient pas être suivis par git.</li>
@@ -237,23 +254,24 @@ pouces   : 24 25 26 27 28</pre>
 </main>
 
 <footer>
-  <div class="wrap">Récapitulatif établi le 23 octobre 2026 à partir de <code>keyboard.json</code>, <code>keymaps/via/keymap.c</code> et de l'historique git. Licence GPL-2.0-or-later.</div>
+  <div class="wrap">Récapitulatif établi le 23 octobre 2026 à partir du PCB KiCad, de <code>keyboard.json</code>, de <code>keymaps/via/keymap.c</code> et de l'historique git. Licence GPL-2.0-or-later.</div>
 </footer>
 
 <script>
 (function(){
-  var U = 58;
-  // Positions des touches : [colonne, rangée] dans la grille 6×4, puis les 5 pouces (x, y, rotation).
-  var thumbs = [[1.5,4.5,-22.5],[2.5,4.2,-45],[3.5,4.5,-22.5],[4.5,4.5,22.5],[5.5,4.2,45]];
-  // LED serpentin : indice de LED -> [rangée, colonne]
-  function ledAt(r,c){
-    if(r===4) return 24+c;
-    return r%2===0 ? r*6+c : r*6+(5-c);
-  }
+  // Positions en unités de touche (1U = 19,05 mm), relevées dans SPlitKeyBoardReversible.kicad_pcb.
+  // Origine : centre de la touche de la colonne 0, rangée 0. x vers la droite, y vers le bas.
+  var X0 = 2.95, Y0 = 0.5;
+  var colX = [0,1,2,3,4,5.25];            // la colonne 5 fait 1,5U
+  var colW = [1,1,1,1,1,1.5];
+  var thumbs = [                           // CH25 à CH29 : x, y, rotation CSS (sens horaire)
+    [-2.13,4.885,-45],[-1.154,4.23,-22.5],[0,4,0],[1.154,4.23,22.5],[2.13,4.885,45]
+  ];
   var C = {blue:'#4c6ef5',violet:'#ae3ec9',yellow:'#fcc419',white:'#f8f9fa',red:'#fa5252',grey:'#868e96'};
+  var NAMES = {blue:'bleu',violet:'violet',yellow:'jaune',white:'blanc',red:'rouge',grey:'gris'};
   var layers = {
     base:{
-      note:"Côté droit de l'AZERTY. La touche en bas à droite est le Ctrl multi-tap : 2× pour FN, 3× pour GAMING.",
+      note:"Côté droit de l'AZERTY. La touche de pouce la plus à droite est le Ctrl multi-tap : 2× pour FN, 3× pour GAMING.",
       keys:[
         ['-','è','_','ç','à',')'],
         ['Y','U','I','O','P','^'],
@@ -280,64 +298,56 @@ pouces   : 24 25 26 27 28</pre>
         [null,['Q','white'],['S','white'],['D','white'],null,null],
         [null,null,null,null,null,null]
       ],
-      thumbs:[['Alt','red'],['R','violet'],['Espace','white'],['Lum −','grey'],['Lum +','white']],
-      // LEDs que keymap.c allume réellement (indice -> couleur)
-      real:{0:'blue',1:'blue',2:'violet',3:'violet',4:'violet',6:'yellow',7:'yellow',8:'white',9:'yellow',
-            13:'white',14:'white',15:'white',24:'red',25:'violet',26:'white',27:'grey',28:'white'}
+      thumbs:[['Alt','red'],['R','violet'],['Espace','white'],['Lum −','grey'],['Lum +','white']]
     }
   };
   var board = document.getElementById('board');
   var note = document.getElementById('layerNote');
   var legend = document.getElementById('legend');
-  var ledBtn = document.getElementById('ledToggle');
-  var current = 'base', showReal = false;
+  var current = 'base';
 
-  function key(x,y,rot,label,sub,color,trans){
+  function key(cx,cy,w,rot,label,sub,color,trans){
     var d = document.createElement('div');
     d.className = 'key' + (color ? ' lit' : '') + (trans ? ' trans' : '');
-    d.style.left = (x*U+3)+'px'; d.style.top = (y*U+3)+'px';
-    if(rot) d.style.transform = 'rotate('+rot+'deg)';
+    d.style.width = 'calc(var(--u) * ' + w + ' - 6px)';
+    d.style.height = 'calc(var(--u) - 6px)';
+    d.style.left = 'calc(var(--u) * ' + (cx + X0 - w/2) + ' + 3px)';
+    d.style.top = 'calc(var(--u) * ' + (cy + Y0 - 0.5) + ' + 3px)';
+    if(rot) d.style.transform = 'rotate(' + rot + 'deg)';
     if(color) d.style.background = C[color];
     d.textContent = label;
-    if(sub){ var s=document.createElement('small'); s.textContent=sub; d.appendChild(s); }
+    if(sub){ var s = document.createElement('small'); s.textContent = sub; d.appendChild(s); }
     return d;
   }
   function render(){
     var L = layers[current];
-    board.textContent = '';
-    note.textContent = L.note;
     var gaming = current === 'gaming';
-    ledBtn.hidden = !gaming;
+    board.textContent = '';
     legend.hidden = !gaming;
     L.keys.forEach(function(row,r){
       row.forEach(function(k,c){
         var label = Array.isArray(k) ? k[0] : k;
         var color = Array.isArray(k) ? k[1] : null;
-        if(gaming && showReal){ color = layers.gaming.real[ledAt(r,c)] || null; }
-        if(label===null && !(gaming && showReal)) { board.appendChild(key(c,r,0,'',null,null,true)); return; }
-        board.appendChild(key(c,r,0,label===null?'':label,null,color,label===null && !color));
+        board.appendChild(key(colX[c], r, colW[c], 0, label === null ? '' : label, null, color, label === null));
       });
     });
     L.thumbs.forEach(function(t,i){
       var p = thumbs[i];
-      var color = gaming ? (showReal ? layers.gaming.real[24+i] : t[1]) : null;
-      var label = t[0], sub = gaming ? null : t[1];
-      board.appendChild(key(p[0],p[1],p[2],label,sub,color,false));
+      board.appendChild(key(p[0], p[1], 1, p[2], t[0], gaming ? null : t[1], gaming ? t[1] : null, false));
     });
+    note.textContent = L.note;
     if(gaming){
-      legend.innerHTML = '<span><i style="background:'+C.blue+'"></i>bleu</span><span><i style="background:'+C.violet+'"></i>violet</span><span><i style="background:'+C.yellow+'"></i>jaune</span><span><i style="background:'+C.white+';border:1px solid var(--line)"></i>blanc</span><span><i style="background:'+C.red+'"></i>rouge</span><span><i style="background:'+C.grey+'"></i>gris</span><span>(touche sans couleur : LED éteinte)</span>';
-      note.textContent = L.note + (showReal ? " Affichage : LEDs réellement allumées par keymap.c d'après l'ordre serpentin (à vérifier sur le clavier)." : " Affichage : intention décrite dans le readme.");
+      legend.innerHTML = Object.keys(C).map(function(n){
+        return '<span><i style="background:' + C[n] + ';border:1px solid var(--line)"></i>' + NAMES[n] + '</span>';
+      }).join('') + '<span>(touche sans couleur : LED éteinte)</span>';
     }
   }
   document.querySelectorAll('.tabs button[data-layer]').forEach(function(b){
-    b.addEventListener('click',function(){
+    b.addEventListener('click', function(){
       current = b.dataset.layer;
-      document.querySelectorAll('.tabs button[data-layer]').forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
+      document.querySelectorAll('.tabs button[data-layer]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
       render();
     });
-  });
-  ledBtn.addEventListener('click',function(){
-    showReal = !showReal; ledBtn.setAttribute('aria-pressed', String(showReal)); render();
   });
   render();
 })();
