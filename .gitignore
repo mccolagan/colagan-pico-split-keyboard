@@ -2,3 +2,8 @@
 .claude/
 *.swp
 *.save
+*.lck
+_autosave-*
+*-backups/
+fp-info-cache
+*.kicad_prl
