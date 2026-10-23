@@ -207,6 +207,7 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
 ├── keymaps/vial/          # variante Vial : + vial.json
 ├── build.sh · flash.sh    # compilation et flash
 ├── firmware.uf2           # dernier firmware compilé (v0.3)
+├── hardware/              # sources KiCad du PCB, captures, export 3D
 ├── readme.md              # guide d'utilisation détaillé
 └── docs/index.html        # cette page (+ docs/img : captures du PCB)</pre>
   <p class="muted">Pour compiler, le projet dépend d'un clone de <code>qmk_firmware</code> dans lequel <code>build.sh</code> copie les fichiers : la définition du clavier n'est pas encore autonome.</p>
@@ -218,7 +219,7 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
 
   <h3>Comportement</h3>
   <ul class="clean">
-    <li><span class="tag bug">Bug</span><strong>Coordonnées des LEDs dans <code>keyboard.json</code>.</strong> Les rangées 1 et 3 y sont parcourues de droite à gauche (câblage serpentin) alors que la chaîne réelle est linéaire, et les positions des pouces sont approximatives. Les animations spatiales (dégradés, vagues, spirales) sont donc décalées. L'éclairage du mode GAMING, lui, utilise les bons indices.</li>
+    <li><span class="tag bug">À vérifier</span><strong>Coordonnées des LEDs dans <code>keyboard.json</code>.</strong> Les rangées 1 et 3 y sont décrites de droite à gauche (serpentin) alors que la chaîne du PCB est linéaire, et les positions des pouces sont approximatives. Les LEDs fonctionnent (le mode GAMING utilise les bons indices), mais les effets spatiaux (dégradés gauche-droite, vagues, spirales) pourraient paraître décalés sur ces rangées : à regarder sur le clavier.</li>
     <li><span class="tag bug">À vérifier</span><strong>Ctrl rapides.</strong> Deux appuis sur Ctrl en moins de 200 ms (par exemple Ctrl+C puis Ctrl+V enchaînés) peuvent être pris pour un double-tap et basculer la couche FN.</li>
     <li><span class="tag todo">Idée</span>Remplacer le compteur maison par un <em>Tap Dance</em> QMK, ou donner à FN une touche de couche dédiée (momentanée) pour éviter de basculer au clavier.</li>
     <li><span class="tag todo">Idée</span>Indiquer visuellement la couche active (LED dédiée ou couleur) pour BASE et FN, comme c'est déjà fait pour GAMING.</li>
