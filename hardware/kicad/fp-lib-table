@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Library SplitKeyboard Colagan")(type "KiCad")(uri "${KIPRJMOD}/Library SplitKeyboard Colagan.pretty")(options "")(descr "Empreintes Colagan : KS33 réversible, Pico, USB-C, OLED, logos"))
+)
