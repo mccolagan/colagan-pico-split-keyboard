@@ -7,6 +7,13 @@
 // LED embarquée du Pico (GP25, Pico classique uniquement) : rapide = lien split OK, lent = pas de lien
 #define STATUS_LED GP25
 
+// Moitié fixée à la compilation (HALF_LEFT / HALF_RIGHT) ; sinon, celle branchée au PC est la gauche
+#if defined(HALF_LEFT)
+bool is_keyboard_left_impl(void) { return true; }
+#elif defined(HALF_RIGHT)
+bool is_keyboard_left_impl(void) { return false; }
+#endif
+
 // Test du lien entre moitiés : lettres sur la moitié maître (USB), chiffres/F-keys sur l'esclave.
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT(
@@ -29,7 +36,26 @@ static uint32_t key_flash = 0;
 
 void keyboard_post_init_user(void) {
     gpio_set_pin_output(STATUS_LED);
+    // Arc-en-ciel forcé au démarrage, sans dépendre des réglages RGB gardés en EEPROM par un ancien firmware
+    rgb_matrix_enable_noeeprom();
+#    ifdef RGB_TEST_FIRST_LEDS
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+    rgb_matrix_sethsv_noeeprom(0, 0, 0);
+#    else
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_LEFT_RIGHT);
+    rgb_matrix_sethsv_noeeprom(0, 255, RGB_MATRIX_DEFAULT_VAL);
+#    endif
 }
+
+#    ifdef RGB_TEST_FIRST_LEDS
+// Test matériel : seules les 3 premières LED de la chaîne sont allumées (rouge, vert, bleu)
+bool rgb_matrix_indicators_user(void) {
+    rgb_matrix_set_color(0, 255, 0, 0);
+    rgb_matrix_set_color(1, 0, 255, 0);
+    rgb_matrix_set_color(2, 0, 0, 255);
+    return false;
+}
+#    endif
 
 // Toute touche détectée (maître ou esclave) allume la LED 300 ms
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
