@@ -2,6 +2,8 @@
 
 > Clavier split custom - moitié droite uniquement avec layout AZERTY français
 
+📖 **Page du projet :** https://mccolagan.github.io/colagan-pico-split-keyboard/ · 🛠️ Matériel (KiCad, PCB V2) : [`hardware/`](hardware/README.md)
+
 ---
 
 ## ✨ Caractéristiques
