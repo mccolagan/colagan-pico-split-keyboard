@@ -60,8 +60,8 @@ Les empreintes fonctionnent sans eux ; seul l'affichage 3D dans KiCad en dépend
 
 - **Matrice** : colonnes `Col0`–`Col5`, rangées `Row0`–`Row4`, diodes sur les touches. Brochage du Pico : colonnes GP20, GP22, GP12, GP11, GP10, GP9 ; rangées GP21, GP19, GP18, GP17, GP16 ; LEDs GP13.
 - **LEDs** : chaîne linéaire, LED n = touche CH(n+1) (CH1 à CH29, de gauche à droite sur chaque rangée). Alimentées en 5 V.
-- **Signal LED** : un composant U3 (SOT) convertit la ligne de données 3,3 V du Pico vers 5 V ; une résistance de 4,7 kΩ (R3) est associée au niveau 5 V (voir `images/Capture Signal led 3.3v to 5v.png`).
-- **USB-C** : prise 6 broches en alimentation seule, avec deux résistances de 5,1 kΩ sur CC1/CC2. Les broches de données de la prise sont reliées, par des résistances de 4,7 kΩ (R1, R2), aux signaux `SCL` et `SDA` (voir `images/Capture Type-C.png`).
+- **Signal LED** : la ligne de données du Pico (3,3 V) attaque directement la première LED, sans convertisseur de niveau ni résistance (validé sur les deux moitiés, LED alimentées en 5 V). Les sources V2 n'ont pas de U3 ni de 4k7.
+- **USB-C** : prise `J2` 16 broches (V2), avec deux résistances de 5,1 kΩ (R1, R2) sur CC1/CC2. Les broches de données D+/D- (A6/B6, A7/B7) sont reliées directement aux signaux `SCL` et `SDA` : c'est le lien série entre les deux moitiés.
 - **Géométrie** : grille 6×4 au pas de 19,05 mm ; colonne extérieure 1,5U ; cinq pouces CH25–CH29 en arc (rotations 45°, 22,5°, 0°, −22,5°, −45° dans KiCad).
 
 Ces détails sont lus sur le PCB et les captures : à confirmer sur le schéma avant toute réutilisation.
@@ -73,3 +73,11 @@ Les exports STEP lourds (5,5 et 7 Mo), les modèles 3D du switch, les Gerbers de
 ## Licence
 
 Aucune licence matérielle n'est encore déclarée pour ces fichiers.
+
+## Montage de la moitié gauche (retournée)
+
+Le PCB est réversible : la gauche est la même carte retournée, avec le Pico dans le même sens. Conséquences vérifiées en octobre 2026 :
+- Les étiquettes `NO PIN` et `+5V` sont inversées côté gauche. Les deux trous sont sur le rail 5 V : souder VBUS (broche 40 du Pico) dans l'un, ne jamais souder GP0 (broche 1) dans l'autre, sous peine d'injecter 5 V dans un GPIO.
+- Le brochage est le miroir de la droite : LED sur GP18 (GP13 à droite), matrice colonnes GP11, GP9, GP19, GP20, GP21, GP22 et lignes GP10, GP12, GP13, GP14, GP15, lien série sur GP26.
+- SK6812 mini-E : la broche marquée de la LED est le GND, pas le VDD. Souder à la pâte a donné des contacts intermittents, mieux vaut un fer.
+- Diodes : cathode côté ligne (`COL2ROW`), le sens visuel est inversé d'une face à l'autre.

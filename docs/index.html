@@ -158,7 +158,7 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
     <li><strong>Grille :</strong> 6 colonnes × 4 rangées au pas de 19,05 mm ; la colonne extérieure (CH6, CH12, CH18, CH24) fait 1,5U.</li>
     <li><strong>Pouces :</strong> cinq touches en arc sous la grille, du côté intérieur. CH27 est droite sous la première colonne ; CH26 et CH28 sont inclinées de 22,5° ; CH25 et CH29, plus bas, de 45°. Les extrêmes s'écartent vers l'extérieur de l'arc.</li>
     <li><strong>Interrupteurs :</strong> empreintes KS33 (Gateron low profile), une LED CMS et une diode par touche.</li>
-    <li><strong>Électronique :</strong> support Raspberry Pi Pico en haut à gauche, USB-C avec ses résistances de 5,1 kΩ, résistances de 4,7 kΩ, et un composant de conversion de niveau 3,3 V → 5 V pour la ligne de données des LEDs.</li>
+    <li><strong>Électronique :</strong> support Raspberry Pi Pico en haut à gauche, USB-C 16 broches avec ses deux résistances de 5,1 kΩ. Pas de convertisseur de niveau pour les LEDs : la ligne de données 3,3 V du Pico attaque directement la première LED.</li>
     <li><strong>Variantes :</strong> une version avec écran OLED (<code>SPlitKeyBoardReversibleOLED</code>) existe à côté.</li>
   </ul>
   <p class="muted">Sources : <code>SPlitKeyBoardReversible.kicad_pcb</code> (positions et rotations lues dans le fichier) et captures d'écran KiCad.</p>
