@@ -1,4 +1,0 @@
-(sym_lib_table
-  (version 7)
-  (lib (name "Colagan")(type "KiCad")(uri "${KIPRJMOD}/Colagan.kicad_sym")(options "")(descr "Symboles KS33 hot-swap Colagan (1U et 1,5U), extraits du schéma"))
-)
