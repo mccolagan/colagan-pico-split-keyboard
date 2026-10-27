@@ -10,7 +10,10 @@
 enum layer_names {
     _BASE,      // Côté droit du clavier AZERTY
     _FN,        // Côté gauche du clavier AZERTY (double-tap Ctrl)
-    _GAMING     // Layout gaming avec ZQSD et RGB personnalisé (triple-tap Ctrl)
+    _FPS,       // Warzone : touches par défaut du jeu sous la main droite
+    _MMO,       // WoW : emplacements de sorts + modificateurs aux pouces
+    _MMO_UI,    // Sous-couche tenue : F1-F5 et fenêtres du jeu (C B M N P L)
+    _SEL        // Sélecteur de couche (triple-tap Ctrl ou pouce tenu en jeu)
 };
 
 // ============================================================================
@@ -18,7 +21,7 @@ enum layer_names {
 // ============================================================================
 
 enum custom_keycodes {
-    CTRL_TOG = SAFE_RANGE,  // Multi-tap: 1x=Ctrl, 2x=toggle FN, 3x=toggle GAMING
+    CTRL_TOG = SAFE_RANGE,  // Multi-tap: 1x=Ctrl, 2x=toggle FN, 3x=sélecteur
     RGB_BR_UP,              // Augmenter la luminosité RGB
     RGB_BR_DN               // Diminuer la luminosité RGB
 };
@@ -26,6 +29,12 @@ enum custom_keycodes {
 // Variables pour le multi-tap
 static uint16_t ctrl_timer = 0;
 static uint8_t ctrl_tap_count = 0;
+
+// Fenêtre max entre deux taps du multi-tap Ctrl (ms)
+#define CTRL_MULTITAP_TERM 500
+
+// Touche de menu commune aux couches de jeu : "/" en AZERTY = Shift + ":"
+#define KC_FSLS S(KC_DOT)
 
 // ============================================================================
 // KEYMAPS
@@ -75,27 +84,84 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_DEL,  KC_BSPC, KC_ENT,  KC_LALT, CTRL_TOG
     ),
 
-    /* Layer GAMING - Layout optimisé pour le jeu
-     * Triple-tap sur Ctrl pour activer/désactiver
+    /* Layer FPS - Warzone (touches par défaut, AZERTY côté OS)
+     * Cluster ZQSD identique à la couche MMO.
      *
      * ┌─────┬─────┬─────┬─────┬─────┬─────┐
-     * │  &  │  é  │  "  │  '  │  (  │     │ (bleu/violet)
+     * │  1  │  2  │  3  │  4  │  5  │ Tab │
      * ├─────┼─────┼─────┼─────┼─────┼─────┤
-     * │Ctrl │Shift│  Z  │  E  │     │     │ (jaune/blanc)
+     * │  C  │Shift│  Z  │  E  │  F  │  G  │
      * ├─────┼─────┼─────┼─────┼─────┼─────┤
-     * │     │  Q  │  S  │  D  │     │     │ (blanc - ZQSD)
+     * │  X  │  Q  │  S  │  D  │  R  │  V  │
      * ├─────┼─────┼─────┼─────┼─────┼─────┤
-     * │     │     │     │     │     │     │ (éteint)
+     * │  M  │  T  │  /  │Bksp │ Ent │ Esc │
      * ├─────┼─────┼─────┼─────┼─────┼─────┘
-     * │ Alt │  R  │Space│ Br- │ Br+ │ (rouge/violet/blanc)
+     * │ Spc │Ctrl │ Alt │     │ SEL │
      * └─────┴─────┴─────┴─────┴─────┘
      */
-    [_GAMING] = LAYOUT(
-        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_TRNS,
-        KC_LCTL, KC_LSFT, KC_W,    KC_E,    KC_TRNS, KC_TRNS,
-        KC_TRNS, KC_A,    KC_S,    KC_D,    KC_TRNS, KC_TRNS,
-        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-        KC_LALT, KC_R,    KC_SPC,  RGB_BR_DN, RGB_BR_UP
+    [_FPS] = LAYOUT(
+        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_TAB,
+        KC_C,    KC_LSFT, KC_W,    KC_E,    KC_F,    KC_G,
+        KC_X,    KC_A,    KC_S,    KC_D,    KC_R,    KC_V,
+        KC_M,    KC_T,    KC_FSLS, KC_BSPC, KC_ENT,  KC_ESC,
+        KC_SPC,  KC_LCTL, KC_LALT, KC_NO,   MO(_SEL)
+    ),
+
+    /* Layer MMO - WoW (S1..S11 = emplacements de sorts, à lier dans le jeu)
+     * Shift/Ctrl/Alt aux pouces multiplient chaque emplacement.
+     *
+     * ┌─────┬─────┬─────┬─────┬─────┬─────┐
+     * │ S1  │ S2  │ S3  │ S4  │ S5  │ S6  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │ Tab │  A  │  Z  │  E  │ S7  │ S8  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │NumLk│  Q  │  S  │  D  │ S9  │ S10 │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │ S11 │ UI  │  /  │Bksp │ Ent │ Esc │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┘
+     * │ Spc │Shift│Ctrl │ Alt │ SEL │
+     * └─────┴─────┴─────┴─────┴─────┘
+     */
+    [_MMO] = LAYOUT(
+        KC_1,    KC_2,       KC_3,    KC_4,    KC_5,    KC_6,
+        KC_TAB,  KC_Q,       KC_W,    KC_E,    KC_7,    KC_8,
+        KC_NUM,  KC_A,       KC_S,    KC_D,    KC_9,    KC_0,
+        KC_MINS, MO(_MMO_UI), KC_FSLS, KC_BSPC, KC_ENT,  KC_ESC,
+        KC_SPC,  KC_LSFT,    KC_LCTL, KC_LALT, MO(_SEL)
+    ),
+
+    /* Layer MMO_UI - tenue depuis MMO, le reste de la couche reste actif
+     * ┌─────┬─────┬─────┬─────┬─────┬─────┐
+     * │ F1  │ F2  │ F3  │ F4  │ F5  │  P  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │     │     │     │     │  C  │  B  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │     │     │     │     │  M  │  N  │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │  L  │     │     │     │     │     │
+     * └─────┴─────┴─────┴─────┴─────┴─────┘
+     */
+    [_MMO_UI] = LAYOUT(
+        KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_P,
+        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_C,    KC_B,
+        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_M,    KC_N,
+        KC_L,    KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+        KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
+    ),
+
+    /* Layer SEL - choix de la couche (relâcher la touche SEL pour annuler)
+     * ┌─────┬─────┬─────┬─────┬─────┬─────┐
+     * │BASE │ FPS │ MMO │ FN  │     │     │
+     * ├─────┼─────┼─────┼─────┼─────┼─────┤
+     * │ Br- │ Br+ │     │     │     │     │
+     * └─────┴─────┴─────┴─────┴─────┴─────┘
+     */
+    [_SEL] = LAYOUT(
+        TO(_BASE),  TO(_FPS),   TO(_MMO),   TO(_FN),    KC_NO,   KC_NO,
+        RGB_BR_DN,  RGB_BR_UP,  KC_NO,      KC_NO,      KC_NO,   KC_NO,
+        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,   KC_NO,
+        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,   KC_NO,
+        KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_TRNS
     )
 };
 
@@ -108,7 +174,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case CTRL_TOG:
             if (record->event.pressed) {
                 // Vérifier si on est dans la fenêtre de multi-tap
-                if (timer_elapsed(ctrl_timer) < TAPPING_TERM) {
+                if (timer_elapsed(ctrl_timer) < CTRL_MULTITAP_TERM) {
                     ctrl_tap_count++;
                 } else {
                     ctrl_tap_count = 1;
@@ -121,15 +187,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         layer_off(_FN);
                     } else {
                         layer_on(_FN);
-                        layer_off(_GAMING);
                     }
                 } else if (ctrl_tap_count == 3) {
-                    // Triple-tap: Toggle layer GAMING
-                    if (IS_LAYER_ON(_GAMING)) {
-                        layer_off(_GAMING);
+                    // Triple-tap: Toggle le sélecteur de couche
+                    layer_off(_FN);
+                    if (IS_LAYER_ON(_SEL)) {
+                        layer_off(_SEL);
                     } else {
-                        layer_on(_GAMING);
-                        layer_off(_FN);
+                        layer_on(_SEL);
                     }
                     ctrl_tap_count = 0;
                 } else {
@@ -160,50 +225,58 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // RGB CONFIGURATION
 // ============================================================================
 
-// Configuration RGB par layer
-layer_state_t layer_state_set_user(layer_state_t state) {
-    switch (get_highest_layer(state)) {
-        case _GAMING:
-            rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-            break;
-        default:
-            break;
+// Index LED = ligne * 6 + colonne (pouces : 24 à 28)
+static void led_group(const uint8_t *leds, uint8_t count, uint8_t r, uint8_t g, uint8_t b) {
+    uint8_t val = rgb_matrix_get_val();
+    for (uint8_t i = 0; i < count; i++) {
+        rgb_matrix_set_color(leds[i], (uint16_t)r * val / 255, (uint16_t)g * val / 255, (uint16_t)b * val / 255);
     }
-    return state;
 }
 
-// Couleurs RGB personnalisées pour le layer GAMING
+#define LED_GROUP(r, g, b, ...) do { \
+    static const uint8_t leds[] = { __VA_ARGS__ }; \
+    led_group(leds, sizeof(leds), r, g, b); \
+} while (0)
+
+// Couleurs personnalisées par couche de jeu
 bool rgb_matrix_indicators_user(void) {
-    if (IS_LAYER_ON(_GAMING)) {
-        uint8_t val = rgb_matrix_get_val();
+    switch (get_highest_layer(layer_state)) {
+        case _FPS:
+            rgb_matrix_set_color_all(0, 0, 0);
+            LED_GROUP(0, 0, 255,   0, 1, 2, 3, 4);                    // 1-5 - BLEU
+            LED_GROUP(255, 255, 0, 5, 7, 25);                         // Tab, Shift, Ctrl - JAUNE
+            LED_GROUP(255, 255, 255, 8, 13, 14, 15, 24);              // ZQSD, Espace - BLANC
+            LED_GROUP(255, 0, 0,   6, 9, 10, 11, 12, 16, 17, 26);     // Actions, Alt - ROUGE
+            LED_GROUP(255, 0, 255, 18, 19, 20, 21, 22, 23);           // Menus - VIOLET
+            LED_GROUP(0, 255, 0,   28);                               // Sélecteur - VERT
+            break;
 
-        // Éteindre toutes les LEDs
-        rgb_matrix_set_color_all(0, 0, 0);
+        case _MMO:
+        case _MMO_UI:
+            rgb_matrix_set_color_all(0, 0, 0);
+            LED_GROUP(0, 0, 255,   0, 1, 2, 3, 4, 5, 10, 11, 16, 17, 18);  // Sorts S1-S11 - BLEU
+            LED_GROUP(255, 255, 255, 8, 13, 14, 15, 24);              // ZQSD, Espace - BLANC
+            LED_GROUP(50, 50, 50,  7, 9);                             // Strafe A/E - GRIS
+            LED_GROUP(255, 255, 0, 6, 12, 25, 26, 27);                // Tab, autorun, modificateurs - JAUNE
+            LED_GROUP(255, 0, 255, 20, 21, 22, 23);                   // Menus - VIOLET
+            LED_GROUP(0, 255, 0,   19, 28);                           // UI, sélecteur - VERT
+            if (IS_LAYER_ON(_MMO_UI)) {
+                rgb_matrix_set_color_all(0, 0, 0);
+                LED_GROUP(0, 255, 0, 0, 1, 2, 3, 4, 5, 10, 11, 16, 17, 18);  // F1-F5, fenêtres - VERT
+                LED_GROUP(255, 255, 255, 8, 13, 14, 15, 24);          // ZQSD, Espace - BLANC
+            }
+            break;
 
-        // Ligne 0: Chiffres (&, é, ", ', ()
-        rgb_matrix_set_color(0, 0, 0, val);        // & - BLEU
-        rgb_matrix_set_color(1, 0, 0, val);        // é - BLEU
-        rgb_matrix_set_color(2, val, 0, val);      // " - VIOLET
-        rgb_matrix_set_color(3, val, 0, val);      // ' - VIOLET
-        rgb_matrix_set_color(4, val, 0, val);      // ( - VIOLET
+        case _SEL:
+            rgb_matrix_set_color_all(0, 0, 0);
+            LED_GROUP(255, 255, 255, 0, 6, 7);                        // BASE, luminosité - BLANC
+            LED_GROUP(255, 0, 0,   1);                                // FPS - ROUGE
+            LED_GROUP(0, 0, 255,   2);                                // MMO - BLEU
+            LED_GROUP(0, 255, 0,   3);                                // FN - VERT
+            break;
 
-        // Ligne 1: Modificateurs et mouvement vertical (Ctrl, Shift, Z, E)
-        rgb_matrix_set_color(6, val, val, 0);      // Ctrl - JAUNE
-        rgb_matrix_set_color(7, val, val, 0);      // Shift - JAUNE
-        rgb_matrix_set_color(8, val, val, val);    // Z - BLANC
-        rgb_matrix_set_color(9, val, val, 0);      // E - JAUNE
-
-        // Ligne 2: ZQSD (Q, S, D)
-        rgb_matrix_set_color(13, val, val, val);   // Q - BLANC
-        rgb_matrix_set_color(14, val, val, val);   // S - BLANC
-        rgb_matrix_set_color(15, val, val, val);   // D - BLANC
-
-        // Ligne 4: Actions (Alt, R, Espace, Brightness)
-        rgb_matrix_set_color(24, val, 0, 0);       // Alt - ROUGE
-        rgb_matrix_set_color(25, val, 0, val);     // R - VIOLET
-        rgb_matrix_set_color(26, val, val, val);   // Espace - BLANC
-        rgb_matrix_set_color(27, val/5, val/5, val/5);  // Br- - GRIS
-        rgb_matrix_set_color(28, val, val, val);   // Br+ - BLANC
+        default:
+            break;
     }
     return false;
 }

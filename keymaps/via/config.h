@@ -4,7 +4,7 @@
 #pragma once
 
 // VIA Configuration
-#define DYNAMIC_KEYMAP_LAYER_COUNT 3  // BASE, FN, GAMING
+#define DYNAMIC_KEYMAP_LAYER_COUNT 6  // BASE, FN, FPS, MMO, MMO_UI, SEL
 
 // RGB Matrix Configuration
 #define RGB_MATRIX_DEFAULT_VAL 128  // Luminosité par défaut à 10% (26/255)
