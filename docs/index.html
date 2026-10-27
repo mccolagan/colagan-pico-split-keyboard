@@ -93,7 +93,7 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
   <div class="wrap">
     <div class="eyebrow">Projet clavier DIY</div>
     <h1>Colagan V2 — Right Only</h1>
-    <p class="lead">Une moitié droite de clavier split fabriquée maison, sur RP2040, en AZERTY français, avec trois couches et un mode gaming éclairé touche par touche. Fonctionnel, et encore perfectible.</p>
+    <p class="lead">Une moitié droite de clavier split fabriquée maison, sur RP2040, en AZERTY français, avec des couches de jeu (FPS et MMO) éclairées touche par touche pour jouer de la main droite. Fonctionnel, et encore perfectible.</p>
   </div>
 </header>
 
@@ -120,10 +120,10 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
     <div class="card"><div class="k">Touches</div><div class="v">29</div><div class="s">matrice 6×5, 4 rangées de 6 + 5 pouces</div></div>
     <div class="card"><div class="k">Firmware</div><div class="v">QMK + VIA</div><div class="s">variante Vial également présente</div></div>
     <div class="card"><div class="k">RGB</div><div class="v">29 LEDs</div><div class="s">WS2812 sur GP13, chaîne linéaire</div></div>
-    <div class="card"><div class="k">Couches</div><div class="v">3</div><div class="s">BASE · FN · GAMING</div></div>
-    <div class="card"><div class="k">Version</div><div class="v">v0.3</div><div class="s">« gaming layout », novembre 2025</div></div>
+    <div class="card"><div class="k">Couches</div><div class="v">6</div><div class="s">BASE · FN · FPS · MMO · MMO_UI · SEL</div></div>
+    <div class="card"><div class="k">Version</div><div class="v">v0.4</div><div class="s">couches FPS et MMO, octobre 2026</div></div>
   </div>
-  <p style="margin-top:16px">Le clavier est <em>« right only »</em> : une seule moitié, la droite, sert de clavier complet (le PCB est conçu réversible, voir plus bas). La couche BASE porte le côté droit de l'AZERTY ; un double-tap sur Ctrl bascule sur la couche FN, qui porte le côté gauche. Un triple-tap active le mode GAMING (ZQSD, éclairage dédié).</p>
+  <p style="margin-top:16px">Le clavier est <em>« right only »</em> : une seule moitié, la droite, sert de clavier complet (le PCB est conçu réversible, voir plus bas). La couche BASE porte le côté droit de l'AZERTY ; un double-tap sur Ctrl bascule sur la couche FN, qui porte le côté gauche. Un triple-tap ouvre le sélecteur de couche, pour passer en FPS (Warzone) ou MMO (WoW) : le clavier envoie alors les touches par défaut du jeu, sous la main droite, sans rebind.</p>
 </section>
 
 <section id="couches">
@@ -132,7 +132,10 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
   <div class="tabs" role="group" aria-label="Choix de la couche">
     <button type="button" data-layer="base" aria-pressed="true">BASE</button>
     <button type="button" data-layer="fn" aria-pressed="false">FN</button>
-    <button type="button" data-layer="gaming" aria-pressed="false">GAMING</button>
+    <button type="button" data-layer="fps" aria-pressed="false">FPS</button>
+    <button type="button" data-layer="mmo" aria-pressed="false">MMO</button>
+    <button type="button" data-layer="mmoui" aria-pressed="false">MMO_UI</button>
+    <button type="button" data-layer="sel" aria-pressed="false">SEL</button>
   </div>
   <div class="board-wrap"><div id="board" role="img" aria-label="Disposition des touches de la couche sélectionnée"></div></div>
   <p id="layerNote" class="muted" style="margin-top:12px"></p>
@@ -140,14 +143,15 @@ footer{padding:40px 0 64px;color:var(--muted);font-size:.9rem;border-top:1px sol
 </section>
 
 <section id="multitap">
-  <h2>La touche Ctrl multi-tap</h2>
-  <p>Une seule touche (<code>CTRL_TOG</code>, matrice 4,4) pilote les couches grâce à un compteur de taps dans la fenêtre <code>TAPPING_TERM</code> (200 ms par défaut).</p>
+  <h2>Ctrl multi-tap et sélecteur de couche</h2>
+  <p>Une seule touche (<code>CTRL_TOG</code>, matrice 4,4) pilote les couches grâce à un compteur de taps dans la fenêtre <code>CTRL_MULTITAP_TERM</code> (500 ms).</p>
   <table>
     <tr><th>Taps</th><th>Effet</th></tr>
     <tr><td>1×</td><td>Ctrl normal (enfoncé dès l'appui)</td></tr>
-    <tr><td>2×</td><td>Bascule la couche FN (désactive GAMING si elle était active)</td></tr>
-    <tr><td>3×</td><td>Bascule la couche GAMING (désactive FN), compteur remis à zéro</td></tr>
+    <tr><td>2×</td><td>Bascule la couche FN</td></tr>
+    <tr><td>3×</td><td>Ouvre ou ferme le sélecteur SEL (désactive FN), compteur remis à zéro</td></tr>
   </table>
+  <p>Dans le sélecteur, la rangée du haut choisit la couche : BASE (blanc), FPS (rouge), MMO (bleu), FN (vert). Sur les couches de jeu, le pouce de droite est une touche <code>MO(SEL)</code> : on la tient, on appuie sur la couche voulue, puis on relâche. Sur MMO, la touche <code>UI</code> (rangée du bas, 2<sup>e</sup> colonne) tenue donne F1-F5 et les fenêtres du jeu.</p>
 </section>
 
 <section id="pcb">
@@ -218,10 +222,10 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
 
   <h3>Comportement</h3>
   <ul class="clean">
-    <li><span class="tag bug">À vérifier</span><strong>Coordonnées des LEDs dans <code>keyboard.json</code>.</strong> Les rangées 1 et 3 y sont décrites de droite à gauche (serpentin) alors que la chaîne du PCB est linéaire, et les positions des pouces sont approximatives. Les LEDs fonctionnent (le mode GAMING utilise les bons indices), mais les effets spatiaux (dégradés gauche-droite, vagues, spirales) pourraient paraître décalés sur ces rangées : à regarder sur le clavier.</li>
-    <li><span class="tag bug">À vérifier</span><strong>Ctrl rapides.</strong> Deux appuis sur Ctrl en moins de 200 ms (par exemple Ctrl+C puis Ctrl+V enchaînés) peuvent être pris pour un double-tap et basculer la couche FN.</li>
+    <li><span class="tag bug">À vérifier</span><strong>Coordonnées des LEDs dans <code>keyboard.json</code>.</strong> Les rangées 1 et 3 y sont décrites de droite à gauche (serpentin) alors que la chaîne du PCB est linéaire, et les positions des pouces sont approximatives. Les LEDs fonctionnent (les couches de jeu utilisent index = ligne × 6 + colonne), mais les effets spatiaux (dégradés gauche-droite, vagues, spirales) pourraient paraître décalés sur ces rangées : à regarder sur le clavier.</li>
+    <li><span class="tag bug">À vérifier</span><strong>Ctrl rapides.</strong> Deux appuis sur Ctrl en moins de 500 ms (par exemple Ctrl+C puis Ctrl+V enchaînés) peuvent être pris pour un double-tap et basculer la couche FN.</li>
     <li><span class="tag todo">Idée</span>Remplacer le compteur maison par un <em>Tap Dance</em> QMK, ou donner à FN une touche de couche dédiée (momentanée) pour éviter de basculer au clavier.</li>
-    <li><span class="tag todo">Idée</span>Indiquer visuellement la couche active (LED dédiée ou couleur) pour BASE et FN, comme c'est déjà fait pour GAMING.</li>
+    <li><span class="tag todo">Idée</span>Indiquer visuellement la couche active (LED dédiée ou couleur) pour BASE et FN, comme c'est déjà fait pour FPS et MMO.</li>
   </ul>
 
   <h3>Matériel et structure</h3>
@@ -247,6 +251,7 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
     <li><b>V0.1</b> — première version fonctionnelle.</li>
     <li><b>v0.2</b> — essais puis mise au propre du RGB (« rgb ok », « clean »).</li>
     <li><b>v0.3 « gaming layout »</b> — couche GAMING avec ZQSD, couleurs par touche, contrôles de luminosité intégrés.</li>
+    <li><b>v0.4</b> — couches FPS (Warzone) et MMO (WoW) avec touches de menu communes, sous-couche MMO_UI, sélecteur de couche, multi-tap Ctrl à 500 ms.</li>
   </ul>
   <p class="muted">Onze commits, tous le 23 novembre 2025 ; firmware compilé le 24 novembre 2025.</p>
 </section>
@@ -254,7 +259,7 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
 </main>
 
 <footer>
-  <div class="wrap">Récapitulatif établi le 23 octobre 2026 à partir du PCB KiCad, de <code>keyboard.json</code>, de <code>keymaps/via/keymap.c</code> et de l'historique git. Licence GPL-2.0-or-later.</div>
+  <div class="wrap">Récapitulatif établi le 27 octobre 2026 à partir du PCB KiCad, de <code>keyboard.json</code>, de <code>keymaps/via/keymap.c</code> et de l'historique git. Licence GPL-2.0-or-later.</div>
 </footer>
 
 <script>
@@ -267,18 +272,18 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
   var thumbs = [                           // CH25 à CH29 : x, y, rotation CSS (sens horaire)
     [-2.13,4.885,-45],[-1.154,4.23,-22.5],[0,4,0],[1.154,4.23,22.5],[2.13,4.885,45]
   ];
-  var C = {blue:'#4c6ef5',violet:'#ae3ec9',yellow:'#fcc419',white:'#f8f9fa',red:'#fa5252',grey:'#868e96'};
-  var NAMES = {blue:'bleu',violet:'violet',yellow:'jaune',white:'blanc',red:'rouge',grey:'gris'};
+  var C = {blue:'#4c6ef5',violet:'#ae3ec9',yellow:'#fcc419',white:'#f8f9fa',red:'#fa5252',green:'#40c057',grey:'#868e96'};
+  var NAMES = {blue:'bleu',violet:'violet',yellow:'jaune',white:'blanc',red:'rouge',green:'vert',grey:'gris'};
   var layers = {
     base:{
-      note:"Côté droit de l'AZERTY. La touche de pouce la plus à droite est le Ctrl multi-tap : 2× pour FN, 3× pour GAMING.",
+      note:"Côté droit de l'AZERTY. La touche de pouce la plus à droite est le Ctrl multi-tap : 2× pour FN, 3× pour le sélecteur de couche.",
       keys:[
         ['-','è','_','ç','à',')'],
         ['Y','U','I','O','P','^'],
         ['H','J','K','L','M','ù'],
         ['B','N',',',';',':','!']
       ],
-      thumbs:[['Suppr'],['Retour'],['Entrée'],['Alt'],['Ctrl','2× FN · 3× GAMING']]
+      thumbs:[['Suppr'],['Retour'],['Entrée'],['Alt'],['Ctrl','2× FN · 3× SEL']]
     },
     fn:{
       note:"Côté gauche de l'AZERTY, accessible par double-tap sur Ctrl (nouveau double-tap pour revenir).",
@@ -290,15 +295,49 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
       ],
       thumbs:[['Suppr'],['Retour'],['Entrée'],['Alt'],['Ctrl','2× retour']]
     },
-    gaming:{
-      note:"Triple-tap sur Ctrl. Les cases vides héritent de la couche d'en dessous. Éclairage fixe par touche, proportionnel à la luminosité courante.",
+    fps:{
+      lit:true,
+      note:"Warzone : touches par défaut du jeu (AZERTY côté OS). Le pouce de droite, tenu, ouvre le sélecteur. Les couleurs sont fixes par touche, proportionnelles à la luminosité.",
       keys:[
-        [['&','blue'],['é','blue'],['"','violet'],["'",'violet'],['(','violet'],null],
-        [['Ctrl','yellow'],['Maj','yellow'],['Z','white'],['E','yellow'],null,null],
-        [null,['Q','white'],['S','white'],['D','white'],null,null],
+        [['1','blue'],['2','blue'],['3','blue'],['4','blue'],['5','blue'],['Tab','yellow']],
+        [['C','red'],['Maj','yellow'],['Z','white'],['E','red'],['F','red'],['G','red']],
+        [['X','red'],['Q','white'],['S','white'],['D','white'],['R','red'],['V','red']],
+        [['M','violet'],['T','violet'],['/','violet'],['Retour','violet'],['Entrée','violet'],['Échap','violet']]
+      ],
+      thumbs:[['Espace','white'],['Ctrl','yellow'],['Alt','red'],[null],['SEL','green']]
+    },
+    mmo:{
+      lit:true,
+      note:"WoW : S1 à S11 sont des emplacements de sorts à lier dans le jeu (ou dans VIA) ; Maj, Ctrl et Alt aux pouces les multiplient. UI, tenue, ouvre MMO_UI.",
+      keys:[
+        [['S1','blue'],['S2','blue'],['S3','blue'],['S4','blue'],['S5','blue'],['S6','blue']],
+        [['Tab','yellow'],['A','grey'],['Z','white'],['E','grey'],['S7','blue'],['S8','blue']],
+        [['Verr. num','yellow'],['Q','white'],['S','white'],['D','white'],['S9','blue'],['S10','blue']],
+        [['S11','blue'],['UI','green'],['/','violet'],['Retour','violet'],['Entrée','violet'],['Échap','violet']]
+      ],
+      thumbs:[['Espace','white'],['Maj','yellow'],['Ctrl','yellow'],['Alt','yellow'],['SEL','green']]
+    },
+    mmoui:{
+      lit:true,
+      note:"Sous-couche tenue depuis MMO : F1 à F5 et fenêtres du jeu. Les cases vides gardent la touche de la couche MMO.",
+      keys:[
+        [['F1','green'],['F2','green'],['F3','green'],['F4','green'],['F5','green'],['P','green']],
+        [null,null,['Z','white'],null,['C','green'],['B','green']],
+        [null,['Q','white'],['S','white'],['D','white'],['M','green'],['N','green']],
+        [['L','green'],null,null,null,null,null]
+      ],
+      thumbs:[['Espace','white'],null,null,null,null]
+    },
+    sel:{
+      lit:true,
+      note:"Sélecteur : triple-tap sur Ctrl, ou pouce de droite tenu depuis une couche de jeu. Une touche de la rangée du haut choisit la couche ; les cases vides sont inactives.",
+      keys:[
+        [['BASE','white'],['FPS','red'],['MMO','blue'],['FN','green'],null,null],
+        [['Lum −','white'],['Lum +','white'],null,null,null,null],
+        [null,null,null,null,null,null],
         [null,null,null,null,null,null]
       ],
-      thumbs:[['Alt','red'],['R','violet'],['Espace','white'],['Lum −','grey'],['Lum +','white']]
+      thumbs:[[null],[null],[null],[null],[null]]
     }
   };
   var board = document.getElementById('board');
@@ -321,7 +360,7 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
   }
   function render(){
     var L = layers[current];
-    var gaming = current === 'gaming';
+    var gaming = !!L.lit;
     board.textContent = '';
     legend.hidden = !gaming;
     L.keys.forEach(function(row,r){
@@ -333,7 +372,8 @@ pouces   : 24 25 26 27 28         (CH25 → CH29)</pre>
     });
     L.thumbs.forEach(function(t,i){
       var p = thumbs[i];
-      board.appendChild(key(p[0], p[1], 1, p[2], t[0], gaming ? null : t[1], gaming ? t[1] : null, false));
+      var empty = !t || t[0] === null;
+      board.appendChild(key(p[0], p[1], 1, p[2], empty ? '' : t[0], gaming || empty ? null : t[1], gaming && !empty ? t[1] : null, empty));
     });
     note.textContent = L.note;
     if(gaming){

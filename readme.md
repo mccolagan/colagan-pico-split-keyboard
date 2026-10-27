@@ -19,13 +19,28 @@
 
 ## 🎮 Layers disponibles
 
-Le clavier dispose de **3 layers** accessibles via une touche multi-tap :
+Le clavier dispose de **6 layers**. Il est pensé pour jouer de la main droite (souris à gauche) : les couches de jeu envoient les **touches par défaut du jeu**, placées sous les doigts, pour ne jamais avoir à rebinder.
 
-| Taps | Layer | Description |
-|------|-------|-------------|
-| **1x** | - | Ctrl normal |
-| **2x** | **FN** | Côté gauche du clavier AZERTY (toggle) |
-| **3x** | **GAMING** | Layout optimisé pour le jeu avec RGB personnalisé (toggle) |
+| Layer | Rôle | Accès |
+|-------|------|-------|
+| **BASE** | Côté droit de l'AZERTY | Défaut |
+| **FN** | Côté gauche de l'AZERTY | Double-tap sur Ctrl |
+| **FPS** | Warzone | Sélecteur |
+| **MMO** | WoW | Sélecteur |
+| **MMO_UI** | F1-F5 et fenêtres du jeu | Tenir la touche `UI` depuis MMO |
+| **SEL** | Sélecteur de couche | Triple-tap sur Ctrl, ou tenir le pouce de droite en jeu |
+
+### 🔀 Changer de layer
+
+La touche de pouce tout à droite (matrice 4,4) fait office de Ctrl multi-tap sur BASE et FN (fenêtre de 500 ms entre deux taps) :
+
+| Taps | Effet |
+|------|-------|
+| **1x** | Ctrl normal |
+| **2x** | Toggle FN |
+| **3x** | Ouvre/ferme le sélecteur SEL |
+
+Dans le sélecteur, la rangée du haut propose : **BASE** (blanc), **FPS** (rouge), **MMO** (bleu), **FN** (vert). Un appui choisit la couche. Depuis FPS ou MMO, on **tient** le pouce de droite (en vert), on appuie sur la couche voulue, puis on relâche.
 
 ### 🎯 Layer BASE - Côté DROIT AZERTY
 
@@ -62,35 +77,78 @@ Double-tap sur Ctrl pour activer/désactiver
 └─────┴─────┴─────┴─────┴─────┴─────┘
 ```
 
-### 🎮 Layer GAMING - Layout optimisé pour le jeu
+### 🔫 Layer FPS - Warzone
 
-Triple-tap sur Ctrl pour activer/désactiver
+Touches par défaut du jeu (AZERTY côté OS). Le cluster ZQSD est au même endroit que sur la couche MMO.
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┬─────┐
-│  &  │  é  │  "  │  '  │  (  │     │ 🔵🔵🟣🟣🟣
+│  1  │  2  │  3  │  4  │  5  │ Tab │
 ├─────┼─────┼─────┼─────┼─────┼─────┤
-│Ctrl │Shift│  Z  │  E  │     │     │ 🟡🟡⚪🟡⚫⚫
+│  C  │Shift│  Z  │  E  │  F  │  G  │
 ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │  Q  │  S  │  D  │     │     │ ⚫⚪⚪⚪⚫⚫
+│  X  │  Q  │  S  │  D  │  R  │  V  │
 ├─────┼─────┼─────┼─────┼─────┼─────┤
-│     │     │     │     │     │     │ ⚫⚫⚫⚫⚫⚫
+│  M  │  T  │  /  │Bksp │ Ent │ Esc │
+├─────┼─────┼─────┼─────┼─────┼─────┘
+│ Spc │Ctrl │ Alt │     │ SEL │
+└─────┴─────┴─────┴─────┴─────┘
+```
+
+### ⚔️ Layer MMO - WoW
+
+`S1` à `S11` sont des emplacements de sorts, à lier dans le jeu (ou à remapper dans VIA). Shift, Ctrl et Alt aux pouces multiplient chaque emplacement.
+
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐
+│ S1  │ S2  │ S3  │ S4  │ S5  │ S6  │
 ├─────┼─────┼─────┼─────┼─────┼─────┤
-│ Alt │  R  │Space│ Br- │ Br+ │     │ 🔴🟣⚪⚪⚪⚫
+│ Tab │  A  │  Z  │  E  │ S7  │ S8  │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│NumLk│  Q  │  S  │  D  │ S9  │ S10 │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│ S11 │ UI  │  /  │Bksp │ Ent │ Esc │
+├─────┼─────┼─────┼─────┼─────┼─────┘
+│ Spc │Shift│Ctrl │ Alt │ SEL │
+└─────┴─────┴─────┴─────┴─────┘
+```
+
+`S1` à `S10` envoient `1` à `0` (AZERTY : `& é " ' ( - è _ ç à`), `S11` envoie `-`. Tenir `UI` ouvre la sous-couche **MMO_UI** :
+
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐
+│ F1  │ F2  │ F3  │ F4  │ F5  │  P  │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │  C  │  B  │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │  M  │  N  │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│  L  │     │     │     │     │     │
 └─────┴─────┴─────┴─────┴─────┴─────┘
 ```
 
-**Couleurs RGB :**
-- 🔵 **BLEU** : Chiffres &, é
-- 🟣 **VIOLET** : Chiffres ", ', ( + touches R
-- 🟡 **JAUNE** : Modificateurs (Ctrl, Shift, E)
-- ⚪ **BLANC** : ZQSD + Espace + Brightness
-- 🔴 **ROUGE** : Alt
-- ⚫ **ÉTEINT** : Touches inutilisées
+Les cases vides gardent la touche de la couche MMO.
 
-**Contrôles de luminosité intégrés :**
-- **Br-** : Diminuer la luminosité RGB
-- **Br+** : Augmenter la luminosité RGB
+### 🎛️ Layer SEL - Sélecteur
+
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐
+│BASE │ FPS │ MMO │ FN  │     │     │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│ Br- │ Br+ │     │     │     │     │
+└─────┴─────┴─────┴─────┴─────┴─────┘
+```
+
+**Couleurs RGB des couches de jeu :**
+- 🔵 **BLEU** : armes 1-5 (FPS), sorts (MMO)
+- ⚪ **BLANC** : ZQSD + Espace
+- 🟡 **JAUNE** : modificateurs, Tab
+- 🔴 **ROUGE** : actions de jeu (FPS)
+- 🟣 **VIOLET** : touches de menu (Échap, Entrée, Retour, `/`)
+- 🟢 **VERT** : sélecteur de couche, `UI`
+- ⚫ **ÉTEINT** : touches inutilisées
+
+La luminosité se règle depuis le sélecteur (**Br-** / **Br+**).
 
 ---
 
@@ -152,7 +210,7 @@ colagan-pico-split-keyboard/
 └── 🗂️ keymaps/
     └── via/                       # Keymap VIA
         ├── keymap.c               # Layout des touches + RGB custom
-        └── config.h               # Configuration (3 layers, luminosité)
+        └── config.h               # Configuration (6 layers, luminosité)
 ```
 
 ---
@@ -187,7 +245,7 @@ colagan-pico-split-keyboard/
 Le clavier dispose de 2 modes RGB distincts :
 
 1. **Layers BASE/FN** : Animations RGB Matrix standards (40+ effets)
-2. **Layer GAMING** : Couleurs fixes personnalisées par touche (voir schéma ci-dessus)
+2. **Layers FPS/MMO/SEL** : Couleurs fixes personnalisées par touche (voir schémas ci-dessus)
 
 ### Contrôles RGB via VIA
 
@@ -207,7 +265,7 @@ Dans VIA (onglet **Lighting** → **QMK RGB Matrix**) :
 | `RM_SPDU` | ⚡ Vitesse d'animation +       |
 | `RM_SPDD` | 🐌 Vitesse d'animation -       |
 
-**Note :** En mode GAMING, seuls les contrôles de luminosité (Br-/Br+) fonctionnent. Les autres effets sont désactivés pour maintenir les couleurs personnalisées.
+**Note :** Sur les layers FPS, MMO et SEL, seuls les contrôles de luminosité (Br-/Br+ du sélecteur) fonctionnent. Les autres effets sont désactivés pour maintenir les couleurs personnalisées.
 
 ---
 
@@ -256,13 +314,13 @@ Dans VIA (onglet **Lighting** → **QMK RGB Matrix**) :
 
 C'est normal ! Le clavier démarre en layer BASE avec les animations RGB par défaut.
 
-Pour utiliser le mode GAMING :
-- Triple-tap sur Ctrl (touche en bas à droite)
+Pour utiliser les layers de jeu :
+- Triple-tap sur Ctrl (touche en bas à droite), puis choisir FPS ou MMO
 
 Pour désactiver le RGB au démarrage :
 - Utilisez VIA pour assigner `RM_TOGG` à une touche et éteindre le RGB
 
-### 🎮 Le layer GAMING ne démarre pas avec la bonne luminosité
+### 🎮 Les layers de jeu ne démarrent pas avec la bonne luminosité
 
 Si la luminosité est à 0 après un flash :
 
@@ -324,17 +382,17 @@ GPL-2.0-or-later
 
 ## 🎯 Notes de développement
 
-### Custom RGB Gaming Layer
+### Custom RGB Gaming Layers
 
-Le layer GAMING utilise `rgb_matrix_indicators_user()` pour définir des couleurs personnalisées par touche :
+Les layers FPS, MMO et SEL utilisent `rgb_matrix_indicators_user()` pour définir des couleurs personnalisées par touche :
 - Les couleurs sont proportionnelles à la luminosité globale (`rgb_matrix_get_val()`)
-- Les contrôles Br+/Br- appellent directement `rgb_matrix_increase_val()` et `rgb_matrix_decrease_val()`
-- Le mapping LED suit un pattern serpentin (ligne 0: 0-5, ligne 1: 11-6, ligne 2: 12-17, etc.)
+- Les touches Br+/Br- (layer SEL) appellent directement `rgb_matrix_increase_val()` et `rgb_matrix_decrease_val()`
+- Le mapping LED suit la chaîne linéaire du PCB : index = ligne × 6 + colonne (pouces : 24 à 28)
 
 ### Multi-tap Ctrl Key
 
 La touche Ctrl (position 4,4) utilise un système de multi-tap :
-- Délai de détection : `TAPPING_TERM` (200ms par défaut)
+- Délai de détection : `CTRL_MULTITAP_TERM` (500ms)
 - 1 tap : Ctrl normal
 - 2 taps : Toggle layer FN
-- 3 taps : Toggle layer GAMING
+- 3 taps : Ouvre/ferme le sélecteur SEL (`TO()` vers BASE, FPS, MMO ou FN)
