@@ -4,6 +4,11 @@
 
 📖 **Page du projet :** https://mccolagan.github.io/colagan-pico-split-keyboard/ · 🛠️ Matériel (KiCad, PCB V2) : [`hardware/`](hardware/README.md)
 
+> **Firmware actuel : split Vial des deux moitiés**, documenté dans [`firmware/README.md`](firmware/README.md)
+> (compilation, flash, couches, couleurs par couche éditables depuis le configurateur web, protocole
+> [`docs/led-stream-protocol.md`](docs/led-stream-protocol.md)). La suite de ce fichier décrit l'ancien
+> firmware VIA « Right Only » et est conservée pour référence.
+
 ---
 
 ## ✨ Caractéristiques
@@ -241,6 +246,9 @@ colagan-pico-split-keyboard/
 ## 🎨 RGB Matrix
 
 ### Modes RGB
+
+> Firmware Vial split : couleurs et effet par couche se règlent dans le configurateur web, voir
+> [`firmware/README.md`](firmware/README.md#modifier-les-led). Ce qui suit concerne l'ancien firmware.
 
 Le clavier dispose de 2 modes RGB distincts :
 

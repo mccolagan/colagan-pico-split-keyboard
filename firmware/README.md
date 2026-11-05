@@ -37,9 +37,19 @@ le pouce le referme sans changer de couche.
 
 ## Modifier les LED
 
-- Effet, couleur, luminosité, vitesse : onglet *Lighting* de Vial.
-- Couleurs par couche : tableau `ledmaps` de `keymaps/vial/keymap.c`, même disposition que les keymaps
-  (`__` = effet Vial, `OFF` = éteinte, couleurs dans `palette`). Recompiler et flasher les deux moitiés.
+- **Configurateur web** (dépôt `colagan-configurator`), page Touches, mode *Couleurs* : couleur de chaque touche
+  par couche (ou « Effet » pour laisser voir l'effet RGB), effet propre à une couche, effet global sur la
+  couche 0. Écrit immédiatement dans la mémoire du clavier ; pendant l'édition, le clavier affiche la couche
+  choisie. Pas besoin de recompiler.
+- Vial (onglet *Lighting*) ne règle que l'effet global.
+- Valeurs par défaut des couleurs par couche : tableau `ledmaps` de `keymaps/vial/keymap.c` (`__` = effet,
+  `OFF` = éteinte, couleurs dans `palette`). Elles ne sont chargées que si la mémoire n'a pas encore de
+  couleurs : premier démarrage de ce firmware, ou bootmagic.
+- Stockage (`led_layers.c`) : bloc clavier de l'EEPROM, 1 512 octets (8 couches × 58 LED en RGB, masque
+  « effet », effet par couche). La moitié branchée en USB fait foi et envoie les couleurs à l'autre par le lien
+  split ; brancher la gauche seule utilise **ses** couleurs enregistrées.
+- Les couleurs par couche ne sont **pas** dans le `.vil` de Vial : elles survivent aux reflashs, pas à un
+  bootmagic.
 
 ## Géométrie
 
@@ -47,9 +57,14 @@ le pouce le referme sans changer de couche.
 des switches du PCB KiCad (pouces en arc, colonne extérieure en 1,5U, moitié gauche en miroir).
 Lancé automatiquement par `build-vial.sh`.
 
-## Aperçu des LED en direct (configurateur)
+## Commande du configurateur (raw HID `0xC0`)
 
-Commande raw HID `0xC0` en lecture seule : couleur réelle des 58 LED (effet + couleurs par couche), lue par le
-configurateur web. Spécification : [`docs/led-stream-protocol.md`](../docs/led-stream-protocol.md).
-Test : `tools/led-stream-test.py` (info + une image) ou `tools/led-stream-test.py --frames 100` (cadence).
-Les deux moitiés doivent avoir ce firmware pour voir aussi les LED de la moitié non branchée.
+Protocole « LED stream » v2, spécifié dans [`docs/led-stream-protocol.md`](../docs/led-stream-protocol.md) :
+lecture en direct de la couleur réelle des 58 LED, lecture / écriture des couleurs et de l'effet de chaque
+couche, aperçu d'une couche sur le clavier (expire au bout de 3 s sans renouvellement). Aucun déverrouillage
+Vial requis. Test : `tools/led-stream-test.py` (info + une image) ou `--frames 100` (cadence, ~44 i/s avec les
+deux moitiés). Les deux moitiés doivent avoir ce firmware.
+
+**Mise à jour depuis un firmware antérieur au 05/11/2026** : l'EEPROM émulée a été agrandie (8 Ko) pour garder
+la place des macros ; au premier démarrage, **toute la mémoire repart à zéro** (keymap, effet RGB, réglages).
+Exporter le `.vil` avant, le réimporter après, refaire l'effet RGB.
