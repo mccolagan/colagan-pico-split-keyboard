@@ -98,8 +98,17 @@ def read_frame(kb, info):
     return colors, statuses
 
 
-def swatch(rgb, scale):
-    r, g, b = (min(255, c * scale) for c in rgb)
+def cie(v):
+    """Courbe CIE 1931 de QMK (quantum/led_tables.c) : valeur PWM maximale d'un effet à la luminosité v."""
+    lightness = v * 100 / 255
+    y = lightness / 902.3 if lightness <= 8 else ((lightness + 16) / 116) ** 3
+    return -int(-255 * y // 1)
+
+
+def swatch(rgb, ref):
+    m = max(rgb)
+    k = min(255 / ref, 255 / m) if m and ref else 0
+    r, g, b = (round(c * k) for c in rgb)
     return f"\x1b[48;2;{r};{g};{b}m    \x1b[0m"
 
 
@@ -132,8 +141,8 @@ def main():
         if s:
             print(f"  ⚠ statut 0x{s:02X} : {STATUS.get(s, '?')}")
 
-    # Affichage par position matricielle, valeurs agrandies (luminosité plafonnée à ~64) pour être visibles
-    scale = max(1, 255 // max(1, info["max_brightness"]))
+    # Affichage par position matricielle, normalisé comme conseillé dans la spec (section « Valeurs »)
+    scale = cie(info["val"])
     grid = {pos: (led, rgb) for led, (pos, rgb) in enumerate(zip(positions, colors))}
     for row in range(info["rows"]):
         line = []
