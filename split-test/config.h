@@ -5,6 +5,12 @@
 
 #define SERIAL_PIO_USE_PIO1
 
+// Windows derrière un dock/hub énumère le périphérique en plus de 2 s (défaut QMK) : la moitié se croyait esclave.
+#define SPLIT_USB_TIMEOUT 5000
+// Une moitié esclave sans maître redémarre et retente la détection USB.
+#define SPLIT_WATCHDOG_ENABLE
+#define SPLIT_WATCHDOG_TIMEOUT 6000
+
 // Le PCB est réversible : le Pico est monté à l'envers d'une moitié à l'autre, donc les GPIO diffèrent.
 // Brochage déduit du PCB V2 (net -> pastille -> GPIO). Moitié droite = celle du firmware right_only d'origine.
 // Sans HALF_LEFT/HALF_RIGHT : banc de test avec Pico libres reliés par un fil sur GP26.
@@ -16,7 +22,7 @@
 #    else
 #        define WS2812_DI_PIN GP18
 #    endif
-#    define SERIAL_USART_TX_PIN GP26  // net SDA
+#    define SERIAL_USART_TX_PIN GP27  // net SCL : USB-C monté retourné à gauche, D+/D- croisés, SCL gauche = SDA droite
 #elif defined(HALF_RIGHT) || defined(HALF_LEFT_RIGHTPINS)
 #    define SERIAL_USART_TX_PIN GP7   // net SDA
 #else

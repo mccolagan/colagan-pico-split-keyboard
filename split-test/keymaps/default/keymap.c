@@ -8,10 +8,15 @@
 #define STATUS_LED GP25
 
 // Moitié fixée à la compilation (HALF_LEFT / HALF_RIGHT) ; sinon, celle branchée au PC est la gauche
+// Rôles figés aussi : droite = maître, gauche = esclave. La détection USB de QMK attend que l'hôte ait
+// configuré le périphérique ; derrière un dock sous Windows c'est trop lent et la droite se croyait esclave.
+// (VBUS sur GP24 inutilisable : le +5V passe par le câble, les deux moitiés le voient.)
 #if defined(HALF_LEFT)
 bool is_keyboard_left_impl(void) { return true; }
+bool is_keyboard_master_impl(void) { return false; }
 #elif defined(HALF_RIGHT)
 bool is_keyboard_left_impl(void) { return false; }
+bool is_keyboard_master_impl(void) { return true; }
 #endif
 
 // Test du lien entre moitiés : lettres sur la moitié maître (USB), chiffres/F-keys sur l'esclave.
@@ -57,7 +62,7 @@ bool rgb_matrix_indicators_user(void) {
 }
 #    endif
 
-// Toute touche détectée (maître ou esclave) allume la LED 300 ms
+// Toute touche détectée (maître ou esclave) allume la LED 300 ms (pendant les 10 premières secondes)
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
         key_flash = timer_read32() | 1;
@@ -65,8 +70,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
+// LED du Pico active seulement au démarrage (diagnostic du lien), puis éteinte
+#    define STATUS_LED_BOOT_MS 10000
+
 void housekeeping_task_user(void) {
     static uint32_t last = 0;
+
+    if (timer_read32() > STATUS_LED_BOOT_MS) {
+        gpio_write_pin_low(STATUS_LED);
+        return;
+    }
 
     if (key_flash && timer_elapsed32(key_flash) < 300) {
         gpio_write_pin_high(STATUS_LED);
