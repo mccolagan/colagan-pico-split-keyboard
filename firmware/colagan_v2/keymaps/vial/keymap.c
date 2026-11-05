@@ -167,7 +167,9 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         return false;
     }
 
-    uint8_t val = rgb_matrix_get_val();
+    // Même luminosité que les effets : QMK les fait passer par la courbe CIE 1931 (val 64 → 12), on prend
+    // donc la valeur d'un blanc à la luminosité courante plutôt que val brut.
+    uint8_t val = hsv_to_rgb((hsv_t){0, 0, rgb_matrix_get_val()}).r;
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
             uint8_t color = pgm_read_byte(&ledmaps[layer][row][col]);

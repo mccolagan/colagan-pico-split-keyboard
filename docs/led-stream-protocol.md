@@ -129,17 +129,17 @@ Les LED concernées par `0x10` / `0x11` sont celles du paquet qui n'appartiennen
 ### Valeurs
 
 - Ce sont les octets envoyés aux LED (PWM), **luminosité incluse**. Ne pas les afficher bruts : l'aperçu serait
-  presque noir. Deux échelles coexistent :
-  - **effets RGB Matrix** : QMK applique la courbe perceptive CIE 1931 (`USE_CIE1931_CURVE`). Le maximum d'un
-    canal vaut `CIE(val)`, soit **12 pour val = 64** ;
-  - **couleurs par couche (`ledmaps`)** : `palette × val / 255`, sans courbe. Le maximum vaut `val`, soit 64.
+  presque noir. Effets RGB Matrix **et** couleurs par couche (`ledmaps`, depuis le firmware du 05/11 qui les
+  fait passer par la même courbe) suivent la courbe perceptive CIE 1931 de QMK (`USE_CIE1931_CURVE`) : le
+  maximum d'un canal vaut `CIE(val)`, soit **12 pour val = 64**. (Un firmware antérieur sortait les couleurs de
+  couche en `palette × val / 255`, jusqu'à 64 : la normalisation ci-dessous les écrête sans changer leur teinte.)
 - `CIE(v) = ceil(255 × Y)`, avec `L = v × 100 / 255` et `Y = L / 902,3` si `L ≤ 8`, sinon `((L + 16) / 116)³`.
   Cette formule reproduit exactement les 256 valeurs de la table QMK (`quantum/led_tables.c`). Exemples :
   `CIE(40) = 6`, `CIE(64) = 12`, `CIE(255) = 255`.
 - Affichage conseillé : `ref = CIE(val)` (val lu dans l'info), puis pour chaque LED
   `k = min(255 / ref, 255 / max(r, g, b))` et couleur affichée `(r, g, b) × k`. On obtient un rendu à pleine
-  luminosité pour les effets, et les couleurs de couche, plus fortes, sont écrêtées **en gardant leur teinte**
-  (proportionnellement, pas canal par canal). Si `val = 0` ou que toutes les LED sont à 0 : afficher éteint.
+  luminosité ; une valeur au-dessus de `ref` est écrêtée **en gardant sa teinte** (proportionnellement, pas canal
+  par canal). Si `val = 0` ou que toutes les LED sont à 0 : afficher éteint.
 
 ```js
 const cie = v => { const L = v * 100 / 255; const Y = L <= 8 ? L / 902.3 : ((L + 16) / 116) ** 3; return Math.ceil(255 * Y); };
