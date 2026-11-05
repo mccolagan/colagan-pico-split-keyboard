@@ -37,3 +37,6 @@
 // Effets RGB qui réagissent aux touches ou utilisent un framebuffer
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
+
+// Lecture des couleurs LED par le configurateur (led_stream.c) : RPC pour lire la moitié esclave
+#define SPLIT_TRANSACTION_IDS_KB RPC_ID_KB_LED_STREAM

@@ -46,3 +46,10 @@ le pouce le referme sans changer de couche.
 `gen-layout.py` régénère `keyboard.json` (LAYOUT, positions des LED) et `vial.json` à partir des positions
 des switches du PCB KiCad (pouces en arc, colonne extérieure en 1,5U, moitié gauche en miroir).
 Lancé automatiquement par `build-vial.sh`.
+
+## Aperçu des LED en direct (configurateur)
+
+Commande raw HID `0xC0` en lecture seule : couleur réelle des 58 LED (effet + couleurs par couche), lue par le
+configurateur web. Spécification : [`docs/led-stream-protocol.md`](../docs/led-stream-protocol.md).
+Test : `tools/led-stream-test.py` (info + une image) ou `tools/led-stream-test.py --frames 100` (cadence).
+Les deux moitiés doivent avoir ce firmware pour voir aussi les LED de la moitié non branchée.

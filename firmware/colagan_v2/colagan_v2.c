@@ -4,6 +4,8 @@
 #include "quantum.h"
 #include "split_util.h"
 
+void led_stream_init(void);
+
 // QMK ne plafonne la luminosité qu'au réglage, pas au chargement depuis l'EEPROM : une valeur laissée par
 // un ancien firmware (ex. 200) dépasserait le budget USB avec 58 LED.
 static void clamp_rgb_brightness(void) {
@@ -15,6 +17,7 @@ static void clamp_rgb_brightness(void) {
 #if defined(HALF_LEFT)
 void keyboard_post_init_kb(void) {
     clamp_rgb_brightness();
+    led_stream_init();
     keyboard_post_init_user();
 }
 
@@ -30,6 +33,7 @@ bool is_keyboard_left_impl(void) { return false; }
 void keyboard_post_init_kb(void) {
     gpio_set_pin_output(STATUS_LED);
     clamp_rgb_brightness();
+    led_stream_init();
     keyboard_post_init_user();
 }
 
