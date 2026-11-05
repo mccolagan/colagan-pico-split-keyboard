@@ -1,10 +1,13 @@
 # Protocole « LED stream » du Colagan V2 (raw HID, commande `0xC0`)
 
 Lecture en temps réel de la couleur **réellement affichée** par chacune des 58 LED (après effet RGB Matrix,
-couleurs par couche `ledmaps` et luminosité), pour l'aperçu du configurateur web.
-Implémentation : `firmware/colagan_v2/led_stream.c`. Outil de test : `tools/led-stream-test.py`.
+couleurs par couche et luminosité), pour l'aperçu du configurateur web. Depuis la version 2 : lecture et
+écriture des **couleurs et de l'effet de chaque couche**, et aperçu d'une couche sur le clavier.
+Implémentation : `firmware/colagan_v2/led_stream.c` (commandes) et `led_layers.c` (stockage, rendu, split).
+Outil de test : `tools/led-stream-test.py`.
 
-- **Lecture seule** : aucune écriture EEPROM, aucun changement d'état, aucun déverrouillage Vial requis.
+- `0x00`–`0x02` sont en **lecture seule**. `0x04`, `0x06` et `0x08` écrivent en EEPROM (immédiatement, sans
+  « enregistrer » à part). Aucune sous-commande ne demande le déverrouillage Vial.
 - **Requête / réponse** uniquement : le clavier n'envoie jamais rien de lui-même. C'est l'hôte qui fixe la cadence.
 - Compatible Vial / vial.rocks : `0xC0` n'est utilisé ni par VIA 9 (`0x01`–`0x13`), ni par Vial (`0xFE`), ni
   par VialRGB (sous-commandes de `0x07` / `0x08`). `0xFF` reste « commande non gérée ».
@@ -70,17 +73,20 @@ Données à partir de l'octet 3 :
 
 | Octet | Champ | Valeur actuelle |
 |---|---|---|
-| 3 | version du protocole | `1` |
+| 3 | version du protocole | `2` (`1` : firmware sans couleurs par couche, octets 14-16 absents) |
 | 4 | `led_count` | `58` |
 | 5 | LED max par paquet de couleurs | `9` |
 | 6 | positions max par paquet | `13` |
 | 7 | `left_count` : LED de la moitié gauche (indices `0…left_count-1`), le reste est à droite | `29` |
 | 8 | moitié maître : `0` gauche, `1` droite | `1` au quotidien |
-| 9 | drapeaux : bit 0 = split géré par RPC, bit 1 = autre moitié connectée, bit 2 = RGB allumé | `0x07` |
+| 9 | drapeaux : bit 0 = split géré par RPC, bit 1 = autre moitié connectée, bit 2 = RGB allumé, bit 3 = couleurs par couche modifiables (v2) | `0x0F` |
 | 10 | luminosité max (`RGB_MATRIX_MAXIMUM_BRIGHTNESS`) | `64` |
 | 11 | luminosité actuelle (`val`) | `0…64` |
 | 12 | lignes de matrice | `10` |
 | 13 | colonnes de matrice | `6` |
+| 14 | nombre de couches de couleurs (v2) | `8` |
+| 15 | couche active pour la frappe, la plus haute (v2) | `0…7` |
+| 16 | couche en aperçu sur le clavier, `0xFF` = aucune (v2) | |
 
 Exemple de réponse : `C0 00 00 01 3A 09 0D 1D 01 07 40 28 0A 06 00 …` (val = 40).
 
@@ -155,6 +161,50 @@ const display = ([r, g, b], val) => {
 - Une image peut mêler deux trames d'animation consécutives (l'effet est calculé par tranches entre deux
   requêtes) : sans conséquence visible à 20 i/s. Une LED n'est jamais lue avec la couleur de l'effet à la place
   de sa couleur de couche.
+
+## Couleurs et effet par couche (v2)
+
+Chaque couche a, pour chacune des 58 LED, une couleur RGB **pleine luminosité** (0-255) ou le marqueur
+« transparent » : la LED montre alors l'effet RGB. Chaque couche peut aussi remplacer l'effet global.
+Valeurs par défaut (premier démarrage, bootmagic) : tableau `ledmaps` de `keymaps/vial/keymap.c`.
+Le clavier applique la luminosité courante et la courbe CIE au rendu, comme pour les effets.
+
+Format commun des requêtes : `[C0, sous-commande, FF, start, couche, données…]`. Les réponses reprennent
+start et couche : `[C0, sous-commande, statut, start, couche, données…]`. Couche ≥ 8 → statut `0x02`.
+
+| Sous-cmd | Rôle | Données de la requête (octet 5…) | Données de la réponse (octet 5…) |
+|---|---|---|---|
+| `0x03` | lire les couleurs de 8 LED max à partir de `start` | — | `count`, `masque`, `count × (R, G, B)` |
+| `0x04` | écrire les couleurs de `count` LED (1 à 8) à partir de `start` | `count`, `masque`, `count × (R, G, B)` | (requête reprise) |
+| `0x05` | lire l'effet de la couche | — | `override`, `id` (u16 LE), `vitesse`, `H`, `S`, `V` |
+| `0x06` | écrire l'effet de la couche | `override`, `id` (u16 LE), `vitesse`, `H`, `S`, `V` | (requête reprise) |
+| `0x07` | aperçu : le clavier affiche la couche `couche` (`0xFF` = arrêter) | — | — |
+| `0x08` | remettre la couche aux valeurs par défaut (`8` = toutes) | — | — |
+
+- **Masque** : bit `i` à 1 = LED `start + i` transparente (ses octets RGB sont ignorés à l'écriture).
+- **Effet** : `override = 0` → la couche garde l'effet global (celui réglé par VialRGB `0x07 0x41` et enregistré
+  par `0x09`). `override = 1` → identifiant **VialRGB** (0 = éteint), vitesse, teinte, saturation et
+  luminosité (plafonnée à 64) appliqués tant que la couche est affichée. L'effet global est restauré en sortie.
+  Ne pas enregistrer l'effet global (VialRGB `0x09`) pendant qu'une couche à effet propre est affichée : c'est
+  l'effet de la couche qui serait enregistré. Le configurateur met en aperçu la couche 0 pour régler l'effet
+  global.
+- **Aperçu** : le clavier affiche les couleurs **et l'effet** de la couche demandée, sans changer la couche de
+  frappe. Il **expire au bout de 3 s** : le renouveler toutes les ~1 s tant que l'édition est ouverte, et
+  envoyer `0xFF` en sortie. Une déconnexion USB l'arrête donc toute seule.
+- Une image complète d'une couche = 8 requêtes `0x03` (`start` = 0, 8, …, 56 ; la dernière renvoie 2 LED).
+
+Exemple : LED 29-36 de la couche FPS (2), puis écriture de la LED 29 en blanc et de la LED 30 transparente :
+
+```
+→ C0 03 FF 1D 02 …
+← C0 03 00 1D 02 08 00  00 00 FF  00 00 FF  00 00 FF  00 00 FF  00 00 FF  FF FF 00  FF 00 00  FF FF 00
+→ C0 04 FF 1D 02 02 02  FF FF FF  00 00 00 …
+← C0 04 00 1D 02 02 02  FF FF FF  00 00 00 …
+```
+
+Split : le maître enregistre et pousse aux couleurs de l'esclave (RPC `RPC_ID_KB_LED_LAYERS`) ; un contrôle
+toutes les 500 ms resynchronise l'esclave s'il a redémarré ou manqué une écriture. La moitié branchée en USB
+fait foi : brancher la gauche seule utilise **ses propres** couleurs enregistrées.
 
 ## Cadence conseillée
 

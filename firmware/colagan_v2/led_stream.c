@@ -1,8 +1,8 @@
 // Copyright 2026 kebab (@kebab)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// Lecture en temps réel de la couleur des 58 LED par raw HID (commande 0xC0), pour le configurateur web.
-// Lecture seule : aucune écriture EEPROM, aucun changement d'état, pas de déverrouillage Vial requis.
+// Commande raw HID 0xC0 du configurateur web : lecture en temps réel de la couleur des 58 LED (0x00-0x02),
+// et couleurs / effet par couche (0x03-0x08, stockés par led_layers.c). Pas de déverrouillage Vial requis.
 // Spécification : docs/led-stream-protocol.md
 //
 // Source des couleurs : le tampon du driver WS2812 (ws2812_leds[], global dans le driver vendor RP2040).
@@ -15,9 +15,11 @@
 #include "ws2812.h"
 #include "transactions.h"
 #include "split_util.h"
+#include "led_layers.h"
 
 #define LED_STREAM_CMD 0xC0
-#define LED_STREAM_PROTOCOL_VERSION 1
+#define LED_STREAM_PROTOCOL_VERSION 2
+#define LED_STREAM_RPC_VERSION 1  // format du RPC de lecture, indépendant de la version du protocole HID
 #define LED_STREAM_REQ_MARKER 0xFF  // octet 2 des requêtes ; jamais un statut valide (voir la spec)
 
 #define LED_STREAM_COLORS_PER_PACKET 9      // 5 + 9 × 3 = 32 octets
@@ -29,6 +31,12 @@ enum led_stream_sub {
     LS_INFO      = 0x00,
     LS_POSITIONS = 0x01,
     LS_COLORS    = 0x02,
+    LS_LAYER_GET = 0x03,  // couleurs d'une couche
+    LS_LAYER_SET = 0x04,
+    LS_EFFECT_GET = 0x05, // effet d'une couche
+    LS_EFFECT_SET = 0x06,
+    LS_PREVIEW   = 0x07,  // aperçu d'une couche sur le clavier
+    LS_LAYER_RESET = 0x08,
 };
 
 enum led_stream_status {
@@ -44,6 +52,7 @@ enum led_stream_flags {
     LS_FLAG_SPLIT_RPC        = 1 << 0,
     LS_FLAG_REMOTE_CONNECTED = 1 << 1,
     LS_FLAG_RGB_ENABLED      = 1 << 2,
+    LS_FLAG_LAYERS_EDITABLE  = 1 << 3,
 };
 
 extern ws2812_led_t ws2812_leds[];
@@ -74,7 +83,7 @@ typedef struct PACKED {
 } led_rpc_req_t;
 
 typedef struct PACKED {
-    uint8_t version;  // LED_STREAM_PROTOCOL_VERSION : détecte une moitié restée sur un ancien firmware
+    uint8_t version;  // LED_STREAM_RPC_VERSION : détecte une moitié restée sur un ancien firmware
     uint8_t rgb[LED_STREAM_COLORS_PER_PACKET * 3];
 } led_rpc_resp_t;
 
@@ -91,7 +100,7 @@ static void led_stream_slave_rpc(uint8_t in_len, const void *in, uint8_t out_len
     if (req->count > LED_STREAM_COLORS_PER_PACKET || req->start + req->count > LED_STREAM_LEFT_COUNT) {
         return;  // version 0 → le maître signale LS_REMOTE_MISMATCH
     }
-    resp->version = LED_STREAM_PROTOCOL_VERSION;
+    resp->version = LED_STREAM_RPC_VERSION;
     copy_local_rgb(req->start, req->count, resp->rgb);
 }
 
@@ -122,12 +131,61 @@ static uint8_t handle_info(uint8_t *out) {
     out[3] = LED_STREAM_POSITIONS_PER_PACKET;
     out[4] = LED_STREAM_LEFT_COUNT;
     out[5] = is_keyboard_left() ? 0 : 1;
-    out[6] = LS_FLAG_SPLIT_RPC | (is_transport_connected() ? LS_FLAG_REMOTE_CONNECTED : 0) | (rgb_matrix_is_enabled() ? LS_FLAG_RGB_ENABLED : 0);
+    out[6] = LS_FLAG_SPLIT_RPC | LS_FLAG_LAYERS_EDITABLE | (is_transport_connected() ? LS_FLAG_REMOTE_CONNECTED : 0) | (rgb_matrix_is_enabled() ? LS_FLAG_RGB_ENABLED : 0);
     out[7] = RGB_MATRIX_MAXIMUM_BRIGHTNESS;
     out[8] = rgb_matrix_get_val();
     out[9] = MATRIX_ROWS;
     out[10] = MATRIX_COLS;
+    out[11] = LED_LAYERS;
+    out[12] = led_layers_active_layer();
+    out[13] = led_layers_preview();
     return LS_OK;
+}
+
+// Commandes par couche. Requête : [0xC0, sous-commande, 0xFF, start, couche, données…]
+// Réponse : [0xC0, sous-commande, statut, start, couche, données…]
+static uint8_t handle_layer(uint8_t sub, uint8_t start, uint8_t layer, uint8_t *d) {
+    if (sub == LS_PREVIEW) {
+        led_layers_set_preview(layer);
+        return LS_OK;
+    }
+    if (sub == LS_LAYER_RESET) {
+        if (layer > LED_LAYERS) return LS_ERR_OUT_OF_RANGE;
+        led_layers_reset(layer);
+        return LS_OK;
+    }
+    if (layer >= LED_LAYERS) return LS_ERR_OUT_OF_RANGE;
+
+    switch (sub) {
+        case LS_LAYER_GET: {
+            if (start >= LED_LAYERS_LEDS) return LS_ERR_OUT_OF_RANGE;
+            uint8_t count = MIN(LED_LAYERS_RANGE_MAX, LED_LAYERS_LEDS - start);
+            memset(d, 0, 27);
+            d[0] = count;
+            led_layers_read(layer, start, count, &d[1], &d[2]);
+            return LS_OK;
+        }
+        case LS_LAYER_SET: {
+            uint8_t count = d[0];
+            if (count == 0 || count > LED_LAYERS_RANGE_MAX || start + count > LED_LAYERS_LEDS) return LS_ERR_OUT_OF_RANGE;
+            led_layers_write(layer, start, count, d[1], &d[2]);
+            return LS_OK;
+        }
+        case LS_EFFECT_GET: {
+            led_layer_effect_t e;
+            led_layers_get_effect(layer, &e);
+            memset(d, 0, 27);
+            memcpy(d, &e, sizeof(e));
+            return LS_OK;
+        }
+        case LS_EFFECT_SET: {
+            led_layer_effect_t e;
+            memcpy(&e, d, sizeof(e));
+            led_layers_set_effect(layer, &e);
+            return LS_OK;
+        }
+    }
+    return LS_ERR_UNKNOWN_SUB;
 }
 
 static uint8_t handle_positions(uint8_t start, uint8_t *count, uint8_t *out) {
@@ -159,7 +217,7 @@ static uint8_t handle_colors(uint8_t start, uint8_t *count, uint8_t *out) {
             led_rpc_resp_t resp = {0};
             if (!transaction_rpc_exec(RPC_ID_KB_LED_STREAM, sizeof(req), &req, sizeof(resp), &resp)) {
                 status = LS_REMOTE_UNAVAILABLE;
-            } else if (resp.version != LED_STREAM_PROTOCOL_VERSION) {
+            } else if (resp.version != LED_STREAM_RPC_VERSION) {
                 status = LS_REMOTE_MISMATCH;
             } else {
                 memcpy(dst, resp.rgb, n * 3);
@@ -189,6 +247,8 @@ void raw_hid_receive_kb(uint8_t *data, uint8_t length) {
     } else if (sub == LS_INFO) {
         memset(&data[3], 0, length - 3);
         status = handle_info(&data[3]);
+    } else if (sub >= LS_LAYER_GET && sub <= LS_LAYER_RESET) {
+        status = handle_layer(sub, start, data[4], &data[5]);
     } else if (sub != LS_POSITIONS && sub != LS_COLORS) {
         status = LS_ERR_UNKNOWN_SUB;
         memset(&data[3], 0, length - 3);

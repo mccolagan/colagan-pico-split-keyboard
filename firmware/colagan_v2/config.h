@@ -38,5 +38,14 @@
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 
-// Lecture des couleurs LED par le configurateur (led_stream.c) : RPC pour lire la moitié esclave
-#define SPLIT_TRANSACTION_IDS_KB RPC_ID_KB_LED_STREAM
+// Configurateur (led_stream.c, led_layers.c) : RPC pour lire les LED de la moitié esclave et lui envoyer
+// les couleurs par couche
+#define SPLIT_TRANSACTION_IDS_KB RPC_ID_KB_LED_STREAM, RPC_ID_KB_LED_LAYERS
+
+// Couleurs et effet par couche (led_layers.c) : 8 × 58 × 3 + 8 × 8 + 8 × 7 octets dans le bloc clavier.
+// Version propre : un ancien contenu (autre firmware) est remplacé par les couleurs compilées.
+#define EECONFIG_KB_DATA_SIZE 1512
+#define EECONFIG_KB_DATA_VERSION 0xC0A1D002
+
+// EEPROM émulée doublée (16 Ko de flash, 8 Ko utiles) pour garder la place des macros Vial
+#define WEAR_LEVELING_BACKING_SIZE 16384

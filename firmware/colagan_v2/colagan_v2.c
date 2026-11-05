@@ -4,6 +4,8 @@
 #include "quantum.h"
 #include "split_util.h"
 
+#include "led_layers.h"
+
 void led_stream_init(void);
 
 // QMK ne plafonne la luminosité qu'au réglage, pas au chargement depuis l'EEPROM : une valeur laissée par
@@ -18,7 +20,13 @@ static void clamp_rgb_brightness(void) {
 void keyboard_post_init_kb(void) {
     clamp_rgb_brightness();
     led_stream_init();
+    led_layers_init();
     keyboard_post_init_user();
+}
+
+void housekeeping_task_kb(void) {
+    led_layers_task();
+    housekeeping_task_user();
 }
 
 bool is_keyboard_left_impl(void) { return true; }
@@ -34,6 +42,7 @@ void keyboard_post_init_kb(void) {
     gpio_set_pin_output(STATUS_LED);
     clamp_rgb_brightness();
     led_stream_init();
+    led_layers_init();
     keyboard_post_init_user();
 }
 
@@ -46,6 +55,7 @@ void housekeeping_task_kb(void) {
         last = timer_read32();
         gpio_toggle_pin(STATUS_LED);
     }
+    led_layers_task();
     housekeeping_task_user();
 }
 #endif

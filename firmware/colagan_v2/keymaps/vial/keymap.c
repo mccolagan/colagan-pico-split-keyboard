@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
+#include "led_layers.h"
 
 // Keymap par défaut : chargée au premier démarrage ou après un « Reset » dans Vial. Ensuite, les touches
 // se modifient dans Vial (enregistrées dans la mémoire de la droite) ; ce fichier ne sert plus qu'aux couleurs.
@@ -108,11 +109,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 // ============================================================================
-// COULEURS PAR COUCHE
-// Même disposition que les keymaps. __ = laisser l'effet choisi dans Vial ; OFF = éteinte.
-// Une couche absente du tableau (ou toute en __) garde l'effet Vial partout.
-// Après modification : ./build-vial.sh right (seule la droite a besoin d'être reflashée si la gauche
-// a déjà la même version du tableau ; dans le doute, flasher les deux).
+// COULEURS PAR COUCHE : VALEURS PAR DÉFAUT
+// Même disposition que les keymaps. __ = laisser l'effet RGB ; OFF = éteinte.
+// Chargées seulement si la mémoire du clavier n'a pas encore de couleurs (premier démarrage, bootmagic) :
+// au quotidien, couleurs et effet par couche se règlent dans le configurateur web.
 // ============================================================================
 
 enum led_colors { __, OFF, RED, ORG, YEL, GRN, BLU, PUR, WHT, GRY };
@@ -161,27 +161,18 @@ static const uint8_t PROGMEM ledmaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    uint8_t layer = get_highest_layer(layer_state | default_layer_state);
+// Couleurs par défaut des couches (premier démarrage ou EEPROM effacée) : ensuite elles se modifient
+// dans le configurateur web et sont gardées dans la mémoire du clavier (led_layers.c).
+bool led_layers_default_color(uint8_t layer, uint8_t row, uint8_t col, uint8_t rgb[3]) {
     if (layer >= ARRAY_SIZE(ledmaps)) {
         return false;
     }
-
-    // Même luminosité que les effets : QMK les fait passer par la courbe CIE 1931 (val 64 → 12), on prend
-    // donc la valeur d'un blanc à la luminosité courante plutôt que val brut.
-    uint8_t val = hsv_to_rgb((hsv_t){0, 0, rgb_matrix_get_val()}).r;
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            uint8_t color = pgm_read_byte(&ledmaps[layer][row][col]);
-            uint8_t led   = g_led_config.matrix_co[row][col];
-            if (color == __ || led == NO_LED) {
-                continue;
-            }
-            RGB_MATRIX_INDICATOR_SET_COLOR(led,
-                pgm_read_byte(&palette[color][0]) * val / 255,
-                pgm_read_byte(&palette[color][1]) * val / 255,
-                pgm_read_byte(&palette[color][2]) * val / 255);
-        }
+    uint8_t color = pgm_read_byte(&ledmaps[layer][row][col]);
+    if (color == __) {
+        return false;
     }
-    return false;
+    for (uint8_t i = 0; i < 3; i++) {
+        rgb[i] = pgm_read_byte(&palette[color][i]);
+    }
+    return true;
 }
