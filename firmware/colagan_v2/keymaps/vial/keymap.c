@@ -57,20 +57,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                  ___,     ___,     ___,     ___,     ___,         KC_SPC,  KC_LCTL, KC_LALT, XXX,     SEL_X3
     ),
 
+    // WoW Forever (binds réels : wow-binds/binds-wow.md). Rangée du haut = tourner (← / E),
+    // rangée du milieu = avancer/reculer + esquives (A / D). Q n'est pas lié dans le jeu.
+    // Boutons d'action 1-12 : 1-0, ) (KC_MINS), = (KC_EQL). Attention : Maj+1..6 change de page de barre.
+    // Toujours accessibles sans couche : carte (M), quêtes (L), Entrée, Échap.
     [_MMO] = LAYOUT(
         ___,     ___,     ___,     ___,     ___,     ___,         KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,
-        ___,     ___,     ___,     ___,     ___,     ___,         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_7,    KC_8,
-        ___,     ___,     ___,     ___,     ___,     ___,         KC_NUM,  KC_A,    KC_S,    KC_D,    KC_9,    KC_0,
-        ___,     ___,     ___,     ___,     ___,     ___,         KC_MINS, MO(_MMO_UI), KC_FSLS, KC_BSPC, KC_ENT, KC_ESC,
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_TAB,  KC_LEFT, KC_W,    KC_E,    KC_7,    KC_8,
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_EQL,  KC_Q,    KC_S,    KC_D,    KC_9,    KC_0,
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_MINS, MO(_MMO_UI), KC_SCLN, KC_L, KC_ENT,  KC_ESC,
                  ___,     ___,     ___,     ___,     ___,         KC_SPC,  KC_LSFT, KC_LCTL, KC_LALT, SEL_X3
     ),
 
+    // Tenue depuis MMO : cibles F1-F5, course auto, combat (T, G, F), fenêtres, chat (/ et Retour arrière),
+    // descendre (X), barres d'info (V). Avancer/reculer transparents ; carte, quêtes, Entrée, Échap restent en place.
     [_MMO_UI] = LAYOUT(
-        ___,     ___,     ___,     ___,     ___,     ___,         KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_P,
-        ___,     ___,     ___,     ___,     ___,     ___,         ___,     ___,     ___,     ___,     KC_C,    KC_B,
-        ___,     ___,     ___,     ___,     ___,     ___,         ___,     ___,     ___,     ___,     KC_SCLN, KC_N,
-        ___,     ___,     ___,     ___,     ___,     ___,         KC_L,    ___,     ___,     ___,     ___,     ___,
-                 ___,     ___,     ___,     ___,     ___,         ___,     ___,     ___,     ___,     ___
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_NUM,
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_T,    KC_FSLS, ___,     KC_BSPC, KC_C,    KC_B,
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_G,    ___,     ___,     ___,     KC_K,    KC_N,
+        ___,     ___,     ___,     ___,     ___,     ___,         KC_J,    ___,     ___,     ___,     KC_P,    ___,
+                 ___,     ___,     ___,     ___,     ___,         ___,     KC_X,    KC_F,    KC_V,    ___
     ),
 
     // Ouvert par SEL_X3 ; une touche TO() le referme, ou un appui sur le pouce. QK_BOOT = bootloader (droite)
@@ -139,17 +145,17 @@ static const uint8_t PROGMEM ledmaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_MMO] = LAYOUT(
         OFF, OFF, OFF, OFF, OFF, OFF,     BLU, BLU, BLU, BLU, BLU, BLU,  // sorts bleu
-        OFF, OFF, OFF, OFF, OFF, OFF,     YEL, GRY, WHT, GRY, BLU, BLU,  // Tab, strafe A/E gris
-        OFF, OFF, OFF, OFF, OFF, OFF,     YEL, WHT, WHT, WHT, BLU, BLU,  // autorun, QSD blanc
-        OFF, OFF, OFF, OFF, OFF, OFF,     BLU, GRN, PUR, PUR, PUR, PUR,  // UI vert, menus violet
+        OFF, OFF, OFF, OFF, OFF, OFF,     YEL, GRY, WHT, GRY, BLU, BLU,  // Tab, tourner ← / E gris
+        OFF, OFF, OFF, OFF, OFF, OFF,     BLU, WHT, WHT, WHT, BLU, BLU,  // sort 12, esquive A / S / esquive D
+        OFF, OFF, OFF, OFF, OFF, OFF,     BLU, GRN, PUR, PUR, PUR, PUR,  // sort 11, UI vert, carte/quêtes/Entrée/Échap violet
              OFF, OFF, OFF, OFF, OFF,     WHT, YEL, YEL, YEL, GRN        // Espace, modificateurs, sélecteur
     ),
     [_MMO_UI] = LAYOUT(
-        OFF, OFF, OFF, OFF, OFF, OFF,     GRN, GRN, GRN, GRN, GRN, GRN,  // F1-F5, fenêtres vert
-        OFF, OFF, OFF, OFF, OFF, OFF,     OFF, OFF, WHT, OFF, GRN, GRN,
-        OFF, OFF, OFF, OFF, OFF, OFF,     OFF, WHT, WHT, WHT, GRN, GRN,
-        OFF, OFF, OFF, OFF, OFF, OFF,     GRN, OFF, OFF, OFF, OFF, OFF,
-             OFF, OFF, OFF, OFF, OFF,     WHT, OFF, OFF, OFF, OFF
+        OFF, OFF, OFF, OFF, OFF, OFF,     YEL, YEL, YEL, YEL, YEL, WHT,  // cibles F1-F5, course auto
+        OFF, OFF, OFF, OFF, OFF, OFF,     RED, PUR, WHT, PUR, GRN, GRN,  // attaquer, /, Retour arrière, perso, sacs
+        OFF, OFF, OFF, OFF, OFF, OFF,     RED, WHT, WHT, WHT, GRN, GRN,  // dernier hostile, métiers, talents
+        OFF, OFF, OFF, OFF, OFF, OFF,     GRN, OFF, PUR, PUR, GRN, PUR,  // guilde, carte, quêtes, grimoire, Échap
+             OFF, OFF, OFF, OFF, OFF,     WHT, WHT, RED, GRN, OFF        // Espace, X, assister, barres d'info
     ),
     // Sélecteur : seules les touches utiles sont colorées, les autres montrent l'effet en cours (aperçu)
     [_SEL] = LAYOUT(
